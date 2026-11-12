@@ -348,7 +348,7 @@ struct SettingsView: View {
                 Rule()
                 Toggle(isOn: $m.updateChecks) {
                     RowLabel(title: "Check for updates automatically",
-                             detail: "Once a day ScreenPulse asks GitHub whether a newer version exists. GitHub sees your IP address and the app name and version, nothing else. Nothing is installed by itself.")
+                             detail: "Once a day ScreenPulse asks GitHub whether a newer version exists. GitHub sees your IP address and the app name and version, nothing else. An update is installed only when you click Install.")
                 }
                 .toggleStyle(LEDToggleStyle())
                 .padding(.vertical, 9)

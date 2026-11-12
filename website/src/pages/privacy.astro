@@ -43,7 +43,7 @@ const n = site.name;
 
       <section aria-labelledby="updates">
         <h2 id="updates">Update check</h2>
-        <p>The first time you start {n}, it asks whether it may look for new versions. If you agree, it sends one request to GitHub's public release address for this project, at most once a day. GitHub then sees your IP address and the name and version of the app (as the User-Agent), nothing else. {n} never downloads or installs anything by itself: it only offers to open the release page. You can switch the check off in Settings, and you can run it yourself with Check for Updates… in the menu.</p>
+        <p>The first time you start {n}, it asks whether it may look for new versions. If you agree, it sends one request to GitHub's public release address for this project, at most once a day. GitHub then sees your IP address and the name and version of the app (as the User-Agent), nothing else. When there is a newer version, {n} asks you. Only if you click Install does it download the new version from the same GitHub release, check its signature, and replace itself. Nothing is downloaded or installed without that click. You can switch the check off in Settings, and you can run it yourself with Check for Updates… in the menu.</p>
       </section>
 
       <section aria-labelledby="github">

@@ -2,6 +2,7 @@
 // Run: ./app/test.sh
 
 import Foundation
+import CryptoKit
 
 var failures = 0
 var checks = 0
@@ -142,6 +143,30 @@ expect(UpdateCheck.parseRelease(rel("v1.0.2", url: "https://evil.example/x"), tr
 expect(UpdateCheck.parseRelease(rel("v1.0.2", url: "http://github.com/o/r/releases"), trustedPrefix: trusted) == nil, true, "update: plain http refused")
 expect(UpdateCheck.parseRelease(rel("nightly"), trustedPrefix: trusted) == nil, true, "update: tag without a version")
 expect(UpdateCheck.parseRelease(Data("not json".utf8), trustedPrefix: trusted) == nil, true, "update: unreadable answer")
+// Release assets: the disk image and its signature, only from the trusted repository
+func relAssets(_ assets: [(String, String)]) -> Data {
+    let obj: [String: Any] = ["tag_name": "v1.0.3", "html_url": "https://github.com/o/r/releases/tag/v1.0.3",
+                              "assets": assets.map { ["name": $0.0, "browser_download_url": $0.1] }]
+    return try! JSONSerialization.data(withJSONObject: obj)
+}
+let dl = "https://github.com/o/r/releases/download/v1.0.3/"
+let both = UpdateCheck.parseRelease(relAssets([("ScreenPulse.dmg", dl + "ScreenPulse.dmg"), ("ScreenPulse.dmg.sig", dl + "ScreenPulse.dmg.sig")]), trustedPrefix: trusted)
+expect(both?.canInstall, true, "update: release with disk image and signature can be installed")
+expect(UpdateCheck.parseRelease(relAssets([("ScreenPulse.dmg", dl + "ScreenPulse.dmg")]), trustedPrefix: trusted)?.canInstall, false, "update: no signature, no install")
+expect(UpdateCheck.parseRelease(relAssets([("ScreenPulse.dmg", "https://evil.example/ScreenPulse.dmg"), ("ScreenPulse.dmg.sig", dl + "ScreenPulse.dmg.sig")]), trustedPrefix: trusted)?.canInstall, false, "update: disk image from a foreign address is ignored")
+expect(UpdateCheck.parseRelease(rel("v1.0.2"), trustedPrefix: trusted)?.canInstall, false, "update: release without assets is not installable")
+
+// Signature check (Ed25519)
+let signKey = Curve25519.Signing.PrivateKey()
+let pub = signKey.publicKey.rawRepresentation.base64EncodedString()
+let payload = Data("disk image bytes".utf8)
+let sig = try! signKey.signature(for: payload).base64EncodedString()
+expect(UpdateCheck.verifySignature(of: payload, signature: sig, publicKey: pub), true, "signature: valid")
+expect(UpdateCheck.verifySignature(of: Data("changed".utf8), signature: sig, publicKey: pub), false, "signature: changed file is refused")
+expect(UpdateCheck.verifySignature(of: payload, signature: sig, publicKey: Curve25519.Signing.PrivateKey().publicKey.rawRepresentation.base64EncodedString()), false, "signature: other key is refused")
+expect(UpdateCheck.verifySignature(of: payload, signature: "not base64!", publicKey: pub), false, "signature: unreadable signature is refused")
+expect(UpdateCheck.verifySignature(of: payload, signature: sig + "\n", publicKey: pub + "\n"), true, "signature: trailing newline is fine")
+
 let now = Date(timeIntervalSince1970: 1_800_000_000)
 expect(UpdateCheck.isDue(last: nil, now: now), true, "update: never checked is due")
 expect(UpdateCheck.isDue(last: now.addingTimeInterval(-3600), now: now), false, "update: an hour ago is not due")

@@ -71,6 +71,22 @@ jobs:
           spctl --assess --type open --context context:primary-signature -v build/ScreenPulse.dmg
           xcrun stapler validate build/ScreenPulse.dmg
 
+      - name: Sign the disk image for the in-app updater
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          if [ -z "$UPDATE_SIGNING_KEY" ]; then
+            echo "::error::The UPDATE_SIGNING_KEY secret is missing. Without it the app cannot install this release itself."
+            exit 1
+          fi
+          WANT="$(sed -n 's/.*updatePublicKey = "\([^"]*\)".*/\1/p' app/Sources/ScreenPulse/Config.swift)"
+          GOT="$(swift app/Tools/sign-update.swift --public)"
+          if [ "$WANT" != "$GOT" ]; then
+            echo "::error::UPDATE_SIGNING_KEY does not match updatePublicKey in Config.swift."; exit 1
+          fi
+          swift app/Tools/sign-update.swift build/ScreenPulse.dmg > build/ScreenPulse.dmg.sig
+          test -s build/ScreenPulse.dmg.sig
+
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -86,9 +102,9 @@ jobs:
           fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             # Made on GitHub (or by an earlier run): attach the files, replacing older copies.
-            gh release upload "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 --clobber
+            gh release upload "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 build/ScreenPulse.dmg.sig --clobber
           else
-            gh release create "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 \
+            gh release create "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 build/ScreenPulse.dmg.sig \
               --title "ScreenPulse ${TAG#v}" \
               --notes "$NOTE"$'\n\n'"Requires macOS 13 or later (Apple silicon and Intel). You also need your own Gemini API key; see the setup guide on the website. SHA-256 is in the attached .sha256 file."
           fi

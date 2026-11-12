@@ -61,7 +61,7 @@ Not every Mac or keyboard supports both lights. Settings shows what was detected
 
 - **Model** – which Gemini model to use first. If it is unavailable, ScreenPulse falls back to the others.
 - **Open ScreenPulse at login**.
-- **Check for updates automatically** – on first start ScreenPulse asks whether it may do this. Once a day it asks GitHub whether a newer release exists (GitHub sees your IP address and the app name and version) and tells you if one does. It never installs anything itself: you download the new disk image and drag ScreenPulse onto Applications again. **Check for Updates…** in the menu does it on request.
+- **Check for updates automatically** – on first start ScreenPulse asks whether it may do this. Once a day it asks GitHub whether a newer release exists (GitHub sees your IP address and the app name and version) and tells you if one does. If you click **Install**, ScreenPulse downloads the new version, checks its signature, replaces itself and opens again; your settings, key and permissions stay. If it cannot (for example when it runs from the disk image), it offers the release page instead. **Check for Updates…** in the menu does it on request.
 - **Also trigger with ⌃⌥⌘ alone** – press and release the three modifier keys without another key. Requires Input Monitoring.
 - **Knowledge folder** (menu bar → *Open Knowledge Folder*) – put `.md` files here and they are sent to the AI as background knowledge with every question.
 

@@ -27,10 +27,15 @@ app change (`.github/workflows/macos-app.yml`).
 Releases of a private repository are not downloadable by the public: the repository has to be public first.
 Before the first release, set `releaseAvailable: true` in `website/src/site.ts`.
 The app has an opt-in update check (`app/Sources/ScreenPulse/Updater.swift`, logic in `app/Sources/Core/UpdateCheck.swift`):
-it asks GitHub's `releases/latest` for this repository once a day and offers to open the release page. It
-never installs anything itself, so people download the new disk image. Fully automatic installation (for
-example with the Sparkle framework) is not built: it needs an EdDSA key pair, an appcast in every release and a
-signed app, and is best done once a Developer ID exists.
+it asks GitHub's `releases/latest` for this repository once a day. When a newer version exists it asks the
+user, and only on **Install** does `UpdateInstaller.swift` download `ScreenPulse.dmg` and `ScreenPulse.dmg.sig`
+from that release, check the Ed25519 signature against the public key in `Config.swift`, check the app's
+bundle ID, version and code signature, replace the app and restart it.
+
+The release workflow signs the disk image with the `UPDATE_SIGNING_KEY` repository secret (the private half,
+base64 of the raw 32 bytes) using `app/Tools/sign-update.swift`, and stops if that key does not match the public
+key in `Config.swift`. Keep a private backup of the key. If it is lost, make a new pair, put the new public key
+in the app, and tell users to update by hand once: older versions only trust the old key.
 
 ## Signing so the installer opens without a warning
 

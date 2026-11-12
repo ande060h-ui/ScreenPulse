@@ -2,7 +2,9 @@
 //
 // What it does: a single HTTPS request to GitHub's public "latest release" address for this project,
 // at most once a day. GitHub sees the IP address and the app name and version (User-Agent).
-// What it does not do: it never downloads or installs anything. It only offers to open the release page.
+// When a newer version exists the user is asked. Only if they click Install does UpdateInstaller download
+// the signed disk image from the same release, check the signature and replace the app. Nothing is
+// downloaded or installed without that click.
 
 import AppKit
 
@@ -45,7 +47,7 @@ final class Updater {
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
         alert.messageText = "Check for updates automatically?"
-        alert.informativeText = "ScreenPulse can ask GitHub once a day whether a newer version has been released. GitHub then sees your IP address and the name and version of the app, nothing else. ScreenPulse never installs anything by itself. You can change this in Settings."
+        alert.informativeText = "ScreenPulse can ask GitHub once a day whether a newer version has been released. GitHub then sees your IP address and the name and version of the app, nothing else. Nothing is downloaded or installed unless you click Install. You can change this in Settings."
         alert.addButton(withTitle: "Check Automatically")
         alert.addButton(withTitle: "No Thanks")
         enabled = alert.runModal() == .alertFirstButtonReturn
@@ -106,16 +108,40 @@ final class Updater {
 
     private func present(_ info: UpdateInfo) {
         NSApp.activate(ignoringOtherApps: true)
+        let installable = info.canInstall && UpdateInstaller.blocker == nil
         let alert = NSAlert()
         alert.messageText = "ScreenPulse \(info.version.text) is available"
-        alert.informativeText = "You have version \(AppInfo.version). Download the new disk image from the release page, then drag ScreenPulse onto Applications again and replace the old one."
-        alert.addButton(withTitle: "Open Release Page")
+        if installable {
+            alert.informativeText = "You have version \(AppInfo.version). Install now? ScreenPulse downloads the new version from GitHub, checks its signature, replaces itself and opens again. Your settings, key and permissions stay."
+            alert.addButton(withTitle: "Install")
+        } else {
+            alert.informativeText = "You have version \(AppInfo.version). Download the new disk image from the release page, then drag ScreenPulse onto Applications again and replace the old one."
+            alert.addButton(withTitle: "Open Release Page")
+        }
         alert.addButton(withTitle: "Later")
         alert.addButton(withTitle: "Skip This Version")
         switch alert.runModal() {
-        case .alertFirstButtonReturn: NSWorkspace.shared.open(info.pageURL)
+        case .alertFirstButtonReturn:
+            if installable { installNow(info) } else { NSWorkspace.shared.open(info.pageURL) }
         case .alertThirdButtonReturn: defaults.set(info.tag, forKey: DefaultsKey.skippedUpdate)
         default: break
+        }
+    }
+
+    private func installNow(_ info: UpdateInfo) {
+        Task { @MainActor in
+            do {
+                try await UpdateInstaller.shared.install(info)
+            } catch {
+                NSApp.activate(ignoringOtherApps: true)
+                let alert = NSAlert()
+                alert.alertStyle = .warning
+                alert.messageText = "The update was not installed"
+                alert.informativeText = error.localizedDescription
+                alert.addButton(withTitle: "Open Release Page")
+                alert.addButton(withTitle: "OK")
+                if alert.runModal() == .alertFirstButtonReturn { NSWorkspace.shared.open(info.pageURL) }
+            }
         }
     }
 

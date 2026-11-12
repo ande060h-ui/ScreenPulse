@@ -15,6 +15,11 @@ enum AppInfo {
     static let latestReleaseAPI = "https://api.github.com/repos/\(repoOwner)/\(repoName)/releases/latest"
     /// A release page must start with this, or the app will not open it.
     static let trustedReleasePrefix = "https://github.com/\(repoOwner)/\(repoName)/"
+    /// Public half of the key that signs every released disk image (Ed25519, base64). The app installs an
+    /// update only when its signature matches. The private half is the UPDATE_SIGNING_KEY secret on GitHub.
+    static let updatePublicKey = "qMbEtgkU83p2A7YohfXhGvPkMUnhSiYjHg4f6Td3Z0o="
+    /// The bundle ID of the real app. Only that app installs updates; the Preview build does not.
+    static let releaseBundleID = "com.screenpulse.ScreenPulse"
     /// The version of this build, from Info.plist.
     static var version: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
 }

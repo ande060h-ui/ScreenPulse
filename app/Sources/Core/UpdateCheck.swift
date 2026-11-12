@@ -2,6 +2,7 @@
 // Pure logic (Foundation only), unit-tested without any network.
 
 import Foundation
+import CryptoKit
 
 /// A dotted version such as 1.0.2. A leading "v" and any "-beta" / "+build" suffix are ignored.
 struct AppVersion: Comparable, Equatable {
@@ -41,6 +42,11 @@ struct UpdateInfo: Equatable {
     let tag: String
     /// The release page to open. Always under the project's own repository.
     let pageURL: URL
+    /// The disk image and its signature, when the release has both. Also under the project's repository.
+    var dmgURL: URL? = nil
+    var signatureURL: URL? = nil
+    /// True when the app can download and install this release itself.
+    var canInstall: Bool { dmgURL != nil && signatureURL != nil }
 }
 
 enum UpdateCheck {
@@ -58,7 +64,28 @@ enum UpdateCheck {
               let page = obj["html_url"] as? String,
               page.hasPrefix(trustedPrefix),
               let url = URL(string: page), url.scheme == "https" else { return nil }
-        return UpdateInfo(version: version, tag: tag, pageURL: url)
+        var info = UpdateInfo(version: version, tag: tag, pageURL: url)
+        for asset in (obj["assets"] as? [[String: Any]]) ?? [] {
+            guard let name = asset["name"] as? String,
+                  let link = asset["browser_download_url"] as? String,
+                  link.hasPrefix(trustedPrefix),
+                  let u = URL(string: link), u.scheme == "https" else { continue }
+            if name == dmgName { info.dmgURL = u }
+            if name == dmgName + ".sig" { info.signatureURL = u }
+        }
+        return info
+    }
+
+    /// The disk image a release must carry for the app to install it.
+    static let dmgName = "ScreenPulse.dmg"
+
+    /// Checks a downloaded file against its Ed25519 signature (base64, as written by
+    /// app/Tools/sign-update.swift) and the public key built into the app (base64, raw 32 bytes).
+    static func verifySignature(of data: Data, signature: String, publicKey: String) -> Bool {
+        guard let keyData = Data(base64Encoded: publicKey.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let sigData = Data(base64Encoded: signature.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let key = try? Curve25519.Signing.PublicKey(rawRepresentation: keyData) else { return false }
+        return key.isValidSignature(sigData, for: data)
     }
 
     static func isUpdate(remote: AppVersion, over local: AppVersion) -> Bool { remote > local }
