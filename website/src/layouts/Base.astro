@@ -35,6 +35,11 @@ const jsonLd = {
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script>
+      // Visitor counts with Vercel Web Analytics: no cookies, no personal data (see /privacy/).
+      import { inject } from "@vercel/analytics";
+      inject();
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

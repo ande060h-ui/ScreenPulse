@@ -94,7 +94,7 @@ See [website/README.md](website/README.md).
 
 ## Privacy and security
 
-- There are no accounts, no telemetry, no analytics and no ScreenPulse servers. The project does not collect any data about you.
+- The app has no accounts, no telemetry, no analytics and no ScreenPulse servers, and collects no data about you. The website counts visits with Vercel Web Analytics, without cookies or personal data (see the privacy page).
 - **Update check (optional).** The first time you start the app it asks whether it may look for new versions. If you agree, it asks GitHub once a day for this project's latest release; GitHub then sees your IP address and the app name and version. When a newer version exists it asks you; only if you click **Install** does it download the new version from GitHub, check its signature and replace itself. You can turn the check off in Settings.
 - Nothing is captured until you press the shortcut. One PNG of the display under the pointer is then sent from your Mac directly to Google's Gemini API, using **your own** API key. Everything visible on that display is part of the image. Google's terms decide how it handles the data, and that can depend on whether your key has billing turned on.
 - The temporary screenshot file is deleted after the request.
