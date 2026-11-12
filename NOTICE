@@ -9,5 +9,5 @@ Section 6 of the License provides. Please choose a different name and logo for
 a modified version that you distribute.
 
 Third-party components keep their own licences:
-- Schibsted Grotesk (website font, SIL Open Font License 1.1)
+- Schibsted Grotesk (font of the website and the app's Settings window, SIL Open Font License 1.1; app/Resources/OFL.txt)
 - Astro and its dependencies (website build tooling, MIT and other permissive licences)

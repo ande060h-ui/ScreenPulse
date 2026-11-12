@@ -14,7 +14,13 @@ cd "$(dirname "$0")/.."
 ROOT="$PWD"
 APP="$ROOT/build/ScreenPulse.app"
 DMG="$ROOT/build/ScreenPulse.dmg"
+VOLUME="ScreenPulse"
 WORK="$ROOT/build/dmg"
+if [[ "$PREVIEW" == "1" ]]; then   # test build, see app/build.sh
+  APP="$ROOT/build/ScreenPulse Preview.app"
+  DMG="$ROOT/build/ScreenPulse-Preview.dmg"
+  VOLUME="ScreenPulse Preview"
+fi
 
 [[ "$SKIP_BUILD" == "1" && -d "$APP" ]] || ./app/build.sh --release
 
@@ -34,7 +40,7 @@ python3 -m venv "$WORK/venv"
 "$WORK/venv/bin/pip" install --quiet "dmgbuild>=1.6"
 "$WORK/venv/bin/dmgbuild" -s app/dmg/settings.py \
   -D app="$APP" -D bg="$WORK/background.png" -D icon="$APP/Contents/Resources/AppIcon.icns" \
-  "ScreenPulse" "$DMG"
+  "$VOLUME" "$DMG"
 
 if [[ -n "$SIGN_IDENTITY" && "$SIGN_IDENTITY" != "-" ]]; then
   codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"

@@ -4,7 +4,8 @@ import Foundation
 
 enum AppInfo {
     static let name = "ScreenPulse"
-    static let bundleID = "com.screenpulse.ScreenPulse"
+    /// From Info.plist, so the separate Preview build keeps its own Keychain entry and settings.
+    static let bundleID = Bundle.main.bundleIdentifier ?? "com.screenpulse.ScreenPulse"
     /// Where "How do I get a key?" opens: the setup guide on the website.
     static let setupGuideURL = "https://screenpulse.vercel.app/setup/"
 

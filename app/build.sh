@@ -13,6 +13,14 @@ cd "$(dirname "$0")/.."
 ROOT="$PWD"
 APP="$ROOT/build/ScreenPulse.app"
 BUNDLE_ID="com.screenpulse.ScreenPulse"
+DISPLAY_NAME="ScreenPulse"
+# PREVIEW=1 builds a separate app ("ScreenPulse Preview", its own bundle ID, settings and Keychain
+# entry) for trying a change on a Mac where the real ScreenPulse is installed.
+if [[ "$PREVIEW" == "1" ]]; then
+  APP="$ROOT/build/ScreenPulse Preview.app"
+  BUNDLE_ID="com.screenpulse.ScreenPulse.preview"
+  DISPLAY_NAME="ScreenPulse Preview"
+fi
 VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json | head -1)"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 MIN_MACOS="13.0"
@@ -58,6 +66,9 @@ for sz in 16 32 128 256 512; do
 done
 iconutil -c icns "$TMP/AppIcon.iconset" -o "$APP/Contents/Resources/AppIcon.icns"
 
+# Brand font for the Settings window (SIL Open Font License, see app/Resources/OFL.txt)
+cp app/Resources/SchibstedGrotesk.ttf app/Resources/OFL.txt "$APP/Contents/Resources/"
+
 PROJECT_DIR_KEY=""
 if [[ $RELEASE -eq 0 ]]; then
   PROJECT_DIR_KEY="  <key>SPProjectDir</key><string>$ROOT</string>"
@@ -68,8 +79,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleName</key><string>ScreenPulse</string>
-  <key>CFBundleDisplayName</key><string>ScreenPulse</string>
+  <key>CFBundleName</key><string>$DISPLAY_NAME</string>
+  <key>CFBundleDisplayName</key><string>$DISPLAY_NAME</string>
   <key>CFBundleExecutable</key><string>ScreenPulse</string>
   <key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>

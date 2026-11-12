@@ -56,3 +56,10 @@ jobs:
             build/ScreenPulse.dmg
             build/ScreenPulse.dmg.sha256
           retention-days: 14
+      - name: Preview build (a separate "ScreenPulse Preview" app for trying changes next to an installed ScreenPulse)
+        run: PREVIEW=1 ./scripts/make-dmg.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ScreenPulse-Preview-dmg
+          path: build/ScreenPulse-Preview.dmg
+          retention-days: 14
