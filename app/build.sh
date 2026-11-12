@@ -103,8 +103,9 @@ PLIST
 # A fixed designated requirement keeps macOS permissions across ad-hoc rebuilds.
 # With a Developer ID identity the hardened runtime is enabled for notarization.
 if [[ "$SIGN_IDENTITY" == "-" ]]; then
-  codesign --force --sign - -r="designated => identifier \"$BUNDLE_ID\"" "$APP"
-  codesign --force --sign - "$ROOT/build/capsled"
+  # The hardened runtime stops other programs from injecting code into ScreenPulse.
+  codesign --force --options runtime --sign - -r="designated => identifier \"$BUNDLE_ID\"" "$APP"
+  codesign --force --options runtime --sign - "$ROOT/build/capsled"
 else
   codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$ROOT/build/capsled"
   codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP"

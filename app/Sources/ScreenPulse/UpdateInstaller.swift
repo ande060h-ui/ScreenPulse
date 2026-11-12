@@ -130,12 +130,21 @@ final class UpdateInstaller {
 
     // MARK: Helpers
 
+    /// Where a release download may come from (GitHub serves release files from its own storage hosts).
+    nonisolated private static let allowedHosts = ["github.com", "githubusercontent.com"]
+    /// A disk image is about 2 MB; anything far larger is refused.
+    nonisolated private static let maxDownloadBytes = 200 * 1024 * 1024
+
     nonisolated private static func download(_ url: URL) async throws -> Data {
         var req = URLRequest(url: url)
         req.timeoutInterval = 60
         req.setValue("\(AppInfo.name)/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
         let (data, response) = try await URLSession.shared.data(for: req)
-        guard (response as? HTTPURLResponse)?.statusCode == 200, !data.isEmpty else { throw UpdateInstallError.download }
+        // The signature is what makes a download trustworthy; these checks only refuse obvious nonsense early.
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200, !data.isEmpty,
+              data.count <= maxDownloadBytes,
+              let host = http.url?.host?.lowercased(), allowedHosts.contains(where: { host == $0 || host.hasSuffix("." + $0) })
+        else { throw UpdateInstallError.download }
         return data
     }
 
