@@ -1,6 +1,6 @@
 {
   "name": "screenpulse",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "type": "module",
   "description": "ScreenPulse — a screen-aware AI assistant for macOS that answers in a floating window or as light signals on your keyboard.",
