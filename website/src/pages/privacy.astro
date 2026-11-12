@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { site, repoLinks } from "../site";
+const n = site.name;
+---
+<Base title={`Privacy — ${n}`} description={`What ${n} does with your data: nothing is collected, and your screenshots go straight to Google with your own key.`}>
+  <Header />
+  <main id="main" class="band">
+    <div class="wrap policy">
+      <header class="head">
+        <h1>Privacy</h1>
+        <p class="lede">{n} does not collect data about you. This page says what happens to the data that does move.</p>
+      </header>
+
+      <section aria-labelledby="short">
+        <h2 id="short">In short</h2>
+        <ul class="bullets">
+          <li>There are no accounts, no telemetry, no analytics and no {n} servers.</li>
+          <li>Nothing is captured until you press the shortcut.</li>
+          <li>When you do, one image of your screen goes from your Mac straight to Google, using your own API key.</li>
+          <li>Your key and settings stay on your Mac.</li>
+          <li>An optional update check asks GitHub, once a day, whether a new version exists, and only if you allow it.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="app">
+        <h2 id="app">The app</h2>
+        <p>When you press the shortcut, {n} captures the display your pointer is on, including the pointer, and sends that one image together with your question to Google's Gemini API. Everything visible on that display is part of the image, so close or move anything you do not want sent, and only use {n} on content you may share. The temporary image file on your Mac is deleted after the request.</p>
+        <p>Your API key is stored in the macOS Keychain. Your settings are stored in your Mac's user preferences. Optional background notes that you put in the Knowledge folder stay on your Mac and are sent to Google as part of your questions. The project receives none of this.</p>
+      </section>
+
+      <section aria-labelledby="google">
+        <h2 id="google">What Google does with it</h2>
+        <p>Google, not this project, decides how it handles what it receives, under the terms that apply to your key. Those terms can differ between free keys and keys with billing turned on: on free keys Google may use content to improve its products, and people at Google may read it. Check Google's current terms before using {n} with private content. The <a href="/setup/">setup guide</a> explains why we recommend a key with billing and a spending limit.</p>
+      </section>
+
+      <section aria-labelledby="site">
+        <h2 id="site">This website</h2>
+        <p>The website is a static site. It sets no cookies, runs no analytics and loads its fonts from itself. It is hosted by Vercel, which, as with any website, sees technical request data such as your IP address. See Vercel's privacy policy.</p>
+      </section>
+
+      <section aria-labelledby="updates">
+        <h2 id="updates">Update check</h2>
+        <p>The first time you start {n}, it asks whether it may look for new versions. If you agree, it sends one request to GitHub's public release address for this project, at most once a day. GitHub then sees your IP address and the name and version of the app (as the User-Agent), nothing else. {n} never downloads or installs anything by itself: it only offers to open the release page. You can switch the check off in Settings, and you can run it yourself with Check for Updates… in the menu.</p>
+      </section>
+
+      <section aria-labelledby="github">
+        <h2 id="github">GitHub</h2>
+        <p>The source code and issue tracker are on <a href={repoLinks.source}>GitHub</a>. What you post there, such as an issue or a pull request, is public and handled under GitHub's terms. Never post your API key or private screenshots.</p>
+      </section>
+
+      <section aria-labelledby="changes">
+        <h2 id="changes">If this changes</h2>
+        <p>If the project ever adds accounts, a server or telemetry, this page will be updated first, and the app will say so.</p>
+      </section>
+    </div>
+  </main>
+  <Footer />
+</Base>
+<style>
+  .policy { max-width: 46rem; display: grid; gap: clamp(32px, 5vw, 52px); }
+  .head { display: grid; gap: 16px; }
+  .head h1 { font-size: var(--step-3); }
+  section { display: grid; gap: 14px; }
+  h2 { font-size: var(--step-2); }
+  p, li, dd { color: var(--muted); }
+  p { max-width: 40em; }
+  .bullets { display: grid; gap: 10px; }
+  .bullets li { position: relative; padding-left: 22px; }
+  .bullets li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+  .facts div { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 12px 0; border-top: 1px solid var(--alu-deep); }
+  .facts div:last-child { border-bottom: 1px solid var(--alu-deep); }
+  .facts dt { color: var(--ink); font-weight: 500; }
+  @media (max-width: 560px) { .facts div { grid-template-columns: 1fr; gap: 2px; } }
+</style>

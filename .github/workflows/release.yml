@@ -1,0 +1,94 @@
+name: Release
+
+# Publishes a new download for the website. Either publish a release on GitHub (Releases → Draft a new
+# release, tag e.g. v1.0.1), or push a tag from Terminal: git tag v1.0.1 && git push origin v1.0.1
+# The tag must match the version in package.json. The disk image is attached to that release.
+# The website links to releases/latest/download/ScreenPulse.dmg, so it always serves the newest release.
+on:
+  push:
+    tags: ["v*"]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# A release made on GitHub also creates its tag, so two runs can start; they run one after the other.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      # Signing is optional. Without the secrets the disk image is built unsigned.
+      HAS_CERT: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check that the tag matches the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json | head -1)"
+          if [ "refs/tags/v$VERSION" != "$GITHUB_REF" ]; then
+            echo "Tag $GITHUB_REF does not match package.json version $VERSION"; exit 1
+          fi
+
+      - name: Unit tests
+        run: ./app/test.sh
+
+      - name: Import signing certificate
+        if: env.HAS_CERT == 'true'
+        env:
+          CERT_P12: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          echo "$CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          rm "$RUNNER_TEMP/cert.p12"
+
+      - name: Build disk image
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          SIGN_IDENTITY: ${{ env.HAS_CERT == 'true' && vars.SIGN_IDENTITY || '-' }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: ./scripts/make-dmg.sh
+
+      - name: Check the signature (signed builds only)
+        if: env.HAS_CERT == 'true'
+        run: |
+          spctl --assess --type open --context context:primary-signature -v build/ScreenPulse.dmg
+          xcrun stapler validate build/ScreenPulse.dmg
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
+            echo "Not a tag push: the disk image is built but no release is published."; exit 0
+          fi
+          if [ "$HAS_CERT" = "true" ]; then
+            NOTE="Signed and notarized. Open the disk image and drag ScreenPulse to Applications."
+          else
+            NOTE="Not signed by an Apple Developer ID. After copying the app, macOS may stop it: open System Settings → Privacy & Security and click Open Anyway next to the message about ScreenPulse."
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            # Made on GitHub (or by an earlier run): attach the files, replacing older copies.
+            gh release upload "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 --clobber
+          else
+            gh release create "$TAG" build/ScreenPulse.dmg build/ScreenPulse.dmg.sha256 \
+              --title "ScreenPulse ${TAG#v}" \
+              --notes "$NOTE"$'\n\n'"Requires macOS 13 or later (Apple silicon and Intel). You also need your own Gemini API key; see the setup guide on the website. SHA-256 is in the attached .sha256 file."
+          fi

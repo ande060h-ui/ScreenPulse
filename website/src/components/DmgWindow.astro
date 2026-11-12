@@ -1,0 +1,31 @@
+---
+// An illustration of the installer window: drag the app onto Applications.
+import Logo from "./Logo.astro";
+const { caption = "Open the disk image, then drag ScreenPulse onto Applications." } = Astro.props;
+---
+<figure class="dmg" role="img" aria-label={caption}>
+  <div class="win">
+    <div class="item">
+      <span class="appicon" aria-hidden="true"><Logo size={46} wordmark={false} /></span>
+      <span class="label">ScreenPulse</span>
+    </div>
+    <svg class="chev" width="26" height="44" viewBox="0 0 26 44" aria-hidden="true"><path d="M5 5 L21 22 L5 39" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <div class="item">
+      <svg class="folder" width="92" height="76" viewBox="0 0 92 76" aria-hidden="true">
+        <path d="M6 14a8 8 0 0 1 8-8h22l8 9h34a8 8 0 0 1 8 8v43a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8z" fill="#7aa7d6" />
+        <path d="M6 26h80v37a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8z" fill="#93b9e2" />
+      </svg>
+      <span class="label">Applications</span>
+    </div>
+  </div>
+  <figcaption>{caption}</figcaption>
+</figure>
+<style>
+  .dmg { display: grid; gap: 12px; }
+  .win { display: flex; align-items: center; justify-content: center; gap: clamp(18px, 6vw, 46px); padding: clamp(24px, 5vw, 40px) 16px; background: #ececee; border-radius: var(--r-panel); border: 1px solid #d0d1d6; color: #5a5c61; }
+  .item { display: grid; justify-items: center; gap: 8px; }
+  .appicon { display: grid; place-items: center; width: 92px; height: 92px; border-radius: 21px; background: var(--key); color: var(--legend); box-shadow: 0 6px 16px rgb(19 20 23 / 0.3); }
+  .label { font-size: 0.8125rem; color: #3b3d42; }
+  figcaption { font-size: 0.9375rem; color: var(--muted); }
+  @media (max-width: 400px) { .appicon { width: 72px; height: 72px; border-radius: 17px; } .folder { width: 72px; height: auto; } }
+</style>

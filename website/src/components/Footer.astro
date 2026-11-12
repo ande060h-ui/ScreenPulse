@@ -1,0 +1,24 @@
+---
+import Logo from "./Logo.astro";
+import { site, repoLinks } from "../site";
+---
+<footer class="foot">
+  <div class="wrap foot-in">
+    <Logo />
+    <nav aria-label="Project"><ul>
+      <li><a href="/setup/">Get your API key</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href={repoLinks.source}>Source on GitHub</a></li>
+      <li><a href={repoLinks.license}>Apache-2.0 licence</a></li>
+    </ul></nav>
+    <p class="small">© {new Date().getFullYear()} {site.name} authors. Licensed under the Apache License 2.0. The name and logo are not covered by the licence. Provided as is, without warranty. Not made for exams or anywhere AI help is not allowed. Mac, MacBook and macOS are trademarks of Apple Inc. Gemini is a trademark of Google LLC.</p>
+  </div>
+</footer>
+<style>
+  .foot { border-top: 1px solid var(--alu-deep); padding-block: 36px; }
+  .foot-in { display: flex; flex-wrap: wrap; gap: 16px 40px; justify-content: space-between; align-items: center; }
+  .foot nav ul { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .foot nav a { font-size: 0.9375rem; color: var(--muted); }
+  .foot nav a:hover { color: var(--ink); }
+  .foot .small { max-width: 44em; flex-basis: 100%; }
+</style>

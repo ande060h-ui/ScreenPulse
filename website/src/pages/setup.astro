@@ -1,0 +1,132 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Shot from "../components/Shot.astro";
+import { site, repoLinks } from "../site";
+const n = site.name;
+---
+<Base title={`Get your Gemini key — ${n}`} description={`A step-by-step guide to getting the Google Gemini key that ${n} needs. No computer skills needed.`}>
+  <Header />
+  <main id="main" class="band">
+    <div class="wrap guide">
+      <header class="head">
+        <h1>Get your Gemini key</h1>
+        <p class="lede">{n} needs a key from Google to answer your questions. Getting one takes about five minutes, and you only do it once.</p>
+      </header>
+
+      <section class="intro" aria-labelledby="what">
+        <h2 id="what">What is a key?</h2>
+        <p>A key is a long secret password. It tells Google that the questions come from you. {n} keeps your key safe on your Mac.</p>
+        <h3>Before you start</h3>
+        <ul class="bullets">
+          <li>You need a Google account. If you have Gmail, you have one.</li>
+          <li>You need about five minutes.</li>
+          <li>Step 6 asks for a payment card. If the card is not yours, ask a grown-up first.</li>
+        </ul>
+      </section>
+
+      <ol class="steps">
+        <li>
+          <span class="badge" aria-hidden="true">1</span>
+          <h2>Open Google AI Studio</h2>
+          <p>Go to <a href="https://aistudio.google.com/apikey" rel="noopener">aistudio.google.com/apikey</a> and sign in with your Google account.</p>
+          <p class="see"><b>You should see:</b> a page called <b>API Keys</b>.</p>
+          <Shot name="step-1-open-aistudio" alt="The Google AI Studio page for API keys after signing in" capture="Open aistudio.google.com/apikey signed in; capture the whole browser window." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">2</span>
+          <h2>Click “Create API key”</h2>
+          <p>Look for the button that says <b>Create API key</b> at the top right, and click it.</p>
+          <Shot name="step-2-create-key" alt="The Create API key button" capture="Capture the page with the Create API key button visible; draw a red box around it." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">3</span>
+          <h2>Name the key and create it</h2>
+          <p>Give the key a name you will recognise, for example <b>ScreenPulse</b>. Google also asks for a project. A project is just a folder where your key lives: keep the one Google suggests (often <b>Default Gemini Project</b>). Then click <b>Create key</b>.</p>
+          <Shot name="step-3-choose-project" alt="The Create a new key window with a name and a project" capture="Capture the project dialog that appears after clicking Create API key." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">4</span>
+          <h2>Copy your key</h2>
+          <p>Your key is one long line of letters and numbers. Click <b>Copy key</b>.</p>
+          <p class="warn"><b>Keep it secret.</b> Do not send it to anyone, post it online or save it in a shared document. If it ever leaks, delete it on the same page and make a new one.</p>
+          <Shot name="step-4-copy-key" alt="The API key details window with the Copy key button" capture="Capture the screen showing the new key and the copy button. Blur most of the key before saving the image." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">5</span>
+          <h2>Paste it into {n}</h2>
+          <ol class="sub">
+            <li>Click the {n} icon in the menu bar at the top of your screen, and choose <b>Settings…</b></li>
+            <li>Find the box called <b>API key</b> under <b>Gemini</b>, and paste your key (press ⌘ and V).</li>
+            <li>Click <b>Save</b>, then <b>Check key</b>.</li>
+          </ol>
+          <p class="see"><b>You should see:</b> a green message that says the key works.</p>
+          <Shot name="step-5-paste-in-screenpulse" alt="The ScreenPulse Settings window with the API key box" capture="On a Mac: open ScreenPulse Settings and capture the Gemini (AI) card with a dummy key typed in." />
+          <Shot name="step-5b-key-works" alt="The green message after Check key" capture="On a Mac: capture the Gemini (AI) card after pressing Check key with a working key." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">6</span>
+          <h2>Recommended: turn on billing and set a limit</h2>
+          <p>A key works straight away without paying. Free keys have small limits, though, and Google may use what you send on a free key to improve its products, and people at Google may read it. Keys with billing turned on are treated as private, and have much more room. Check Google’s current terms to be sure.</p>
+          <p>Paid does not mean expensive. A question costs a small fraction of a cent up to a bit under one cent. You can also tell Google the most you are willing to pay each month, so there are no surprises.</p>
+          <ol class="sub">
+            <li>In AI Studio, click <b>Billing</b> in the menu on the left (or <b>Set up billing</b> next to your key) and follow the steps to add a payment card.</li>
+            <li>Click <b>Spend</b> in the menu on the left, then <b>Edit spend cap</b>, and set a monthly limit that you are comfortable with. A small amount is plenty to start.</li>
+            <li>Come back to {n} and press <b>Check key</b> again.</li>
+          </ol>
+          <p class="small">Button names change from time to time. Look for the words “billing” and “spend cap”.</p>
+          <Shot name="step-6-billing" alt="The Billing page in AI Studio, with Billing marked in the menu" capture="Capture the project list in AI Studio showing the Set up billing link." />
+          <Shot name="step-6b-spend-limit" alt="The Spend page in AI Studio, with the Edit spend cap button marked" capture="Capture the billing page where the monthly limit is set." />
+        </li>
+        <li>
+          <span class="badge" aria-hidden="true">7</span>
+          <h2>Ask your first question</h2>
+          <p>Point your mouse at something on the screen and press <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>Space</kbd> together. That is the Control, Option, Command and Space keys.</p>
+          <p>The first time, your Mac asks if {n} may record the screen. Click <b>Allow</b>, then quit {n} from its menu bar icon and open it again.</p>
+        </li>
+      </ol>
+
+      <section aria-labelledby="help">
+        <h2 id="help">If something goes wrong</h2>
+        <dl class="qa">
+          <div><dt>“The key was not accepted”</dt><dd>Copy the key again. Make sure you copied the whole line and no spaces before or after it.</dd></div>
+          <div><dt>“Too many requests”</dt><dd>Wait a minute and try again. Free keys have small limits. Turning on billing (step 6) gives you more room.</dd></div>
+          <div><dt>“Your credits are used up”</dt><dd>Add funds or raise your limit in Google’s billing page.</dd></div>
+          <div><dt>{n} cannot see the screen</dt><dd>Open System Settings, then Privacy &amp; Security, then Screen &amp; System Audio Recording. Switch {n} on. Quit {n} and open it again.</dd></div>
+          <div><dt>Nothing happens when I press the keys</dt><dd>Check that the {n} icon is in the menu bar. Press all four keys together: Control, Option, Command and Space.</dd></div>
+        </dl>
+        <p>Still stuck? <a href={repoLinks.issues}>Open an issue on GitHub</a>. What you write there is public, so never paste your key.</p>
+      </section>
+    </div>
+  </main>
+  <Footer />
+</Base>
+<style>
+  .guide { max-width: 44rem; display: grid; gap: clamp(32px, 5vw, 56px); }
+  .head { display: grid; gap: 16px; }
+  .head h1 { font-size: var(--step-3); }
+  section { display: grid; gap: 14px; }
+  h2 { font-size: var(--step-2); }
+  h3 { margin-top: 6px; }
+  p, li, dd { color: var(--muted); }
+  p { max-width: 38em; font-size: 1.125rem; line-height: 1.6; }
+  .bullets { display: grid; gap: 10px; font-size: 1.125rem; }
+  .bullets li { position: relative; padding-left: 22px; }
+  .bullets li::before { content: ""; position: absolute; left: 0; top: 0.65em; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+  .steps { display: grid; gap: clamp(40px, 6vw, 64px); }
+  .steps > li { display: grid; gap: 14px; position: relative; padding-top: 4px; }
+  .badge { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-key); background: var(--key); color: var(--legend); font-weight: 600; font-size: 1.25rem; box-shadow: 0 3px 0 #000; }
+  .steps h2 { font-size: var(--step-2); }
+  .sub { display: grid; gap: 10px; counter-reset: sub; font-size: 1.125rem; }
+  .sub li { position: relative; padding-left: 30px; counter-increment: sub; }
+  .sub li::before { content: counter(sub) "."; position: absolute; left: 0; font-weight: 600; color: var(--ink); }
+  .see { color: var(--led-ink); }
+  .see b { color: var(--led-ink); }
+  .warn { padding: 14px 16px; border-radius: var(--r-key); background: var(--plate); border: 1px solid #c9a227; color: var(--ink); }
+  .qa { display: grid; }
+  .qa div { padding: 14px 0; border-top: 1px solid var(--alu-deep); display: grid; gap: 4px; }
+  .qa div:last-child { border-bottom: 1px solid var(--alu-deep); }
+  .qa dt { color: var(--ink); font-weight: 600; font-size: 1.0625rem; }
+  .qa dd { font-size: 1.0625rem; }
+</style>

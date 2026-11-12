@@ -1,0 +1,45 @@
+---
+import Logo from "./Logo.astro";
+import { nav } from "../site";
+const base = Astro.url.pathname === "/" ? "" : "/";
+---
+<header class="site-head">
+  <div class="wrap bar">
+    <a href="/" class="home" aria-label="ScreenPulse home"><Logo /></a>
+    <nav aria-label="Main" id="nav">
+      <ul>
+        {nav.map((n) => <li><a href={n.href.startsWith("/") ? n.href : base + n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="keybtn buy" href={base + "#get"}><span class="led"></span>Get it</a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+  </div>
+</header>
+<script>
+  const btn = document.querySelector<HTMLButtonElement>(".site-head .menu")!;
+  const head = document.querySelector<HTMLElement>(".site-head")!;
+  const close = () => { head.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); };
+  btn.addEventListener("click", () => {
+    const open = head.classList.toggle("open");
+    btn.setAttribute("aria-expanded", String(open));
+  });
+  head.querySelectorAll("nav a").forEach((a) => a.addEventListener("click", close));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+</script>
+<style>
+  .site-head { position: sticky; top: 0; z-index: 50; background: rgb(227 229 232 / 0.86); backdrop-filter: blur(14px) saturate(1.4); border-bottom: 1px solid var(--alu-deep); }
+  .bar { display: flex; align-items: center; gap: 28px; height: 68px; }
+  .home { text-decoration: none; margin-right: auto; }
+  nav ul { display: flex; gap: 26px; }
+  nav a { text-decoration: none; font-size: 0.9375rem; color: var(--muted); padding: 8px 0; }
+  nav a:hover { color: var(--ink); }
+  .buy { min-height: 40px; padding: 0 16px; font-size: 0.9375rem; }
+  .menu { display: none; min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid #b9bcc2; background: var(--plate); cursor: pointer; }
+  @media (max-width: 900px) {
+    .menu { display: block; }
+    nav { display: none; position: absolute; left: 0; right: 0; top: 68px; background: var(--plate); border-bottom: 1px solid var(--alu-deep); padding: 8px var(--gutter) 20px; }
+    .open nav { display: block; }
+    nav ul { flex-direction: column; gap: 0; }
+    nav a { display: block; padding: 14px 0; font-size: 1.0625rem; color: var(--ink); border-bottom: 1px solid var(--alu-deep); }
+  }
+</style>

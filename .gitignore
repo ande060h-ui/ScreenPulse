@@ -1,0 +1,22 @@
+# Secrets: the API key must never be committed
+.env
+.env.*
+!.env.example
+
+# Build output (recreate with ./app/build.sh)
+build/
+dist/
+*.app/
+*.dmg
+
+# Dependencies and caches
+node_modules/
+.astro/
+.DS_Store
+
+# Local background knowledge for the AI (may be personal)
+knowledge/
+
+# Benchmark: images and the crop helper are regenerated with node benchmark/make-images.mjs
+benchmark/images/
+benchmark/crop

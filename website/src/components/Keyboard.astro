@@ -1,0 +1,104 @@
+---
+// A MacBook keyboard (US layout, 15 key-units wide). Drive it from script with
+//   data-led="on"       the Caps Lock light
+//   data-backlight="on" the whole backlight (legends and key edges glow)
+//   data-down="on"      presses the shortcut keys ⌃ ⌥ ⌘ Space (the ones marked data-hot)
+type Key = { w: number; l?: string; t?: string; sym?: string; side?: "left" | "right"; caps?: boolean; hot?: boolean; fn?: boolean; id?: boolean; updown?: boolean; arrow?: string };
+const k = (l: string, t?: string, w = 1): Key => ({ w, l, t });
+const fnRow: Key[] = [
+  { w: 1.5, l: "esc", side: "left", fn: true },
+  ...Array.from({ length: 12 }, (_, i) => ({ w: 1, l: `F${i + 1}`, fn: true }) as Key),
+  { w: 1.5, id: true },
+];
+const rows: Key[][] = [
+  [k("`", "~"), k("1", "!"), k("2", "@"), k("3", "#"), k("4", "$"), k("5", "%"), k("6", "^"), k("7", "&"), k("8", "*"), k("9", "("), k("0", ")"), k("-", "_"), k("=", "+"), { w: 2, l: "delete", side: "right" }],
+  [{ w: 1.5, l: "tab", side: "left" }, ...["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"].map((c) => k(c)), k("[", "{"), k("]", "}"), k("\\", "|", 1.5)],
+  [{ w: 1.75, l: "caps lock", side: "left", caps: true }, ...["A", "S", "D", "F", "G", "H", "J", "K", "L"].map((c) => k(c)), k(";", ":"), k("'", '"'), { w: 2.25, l: "return", side: "right" }],
+  [{ w: 2.25, l: "shift", side: "left" }, ...["Z", "X", "C", "V", "B", "N", "M"].map((c) => k(c)), k(",", "<"), k(".", ">"), k("/", "?"), { w: 2.75, l: "shift", side: "right" }],
+  [
+    { w: 1, l: "fn", side: "left" },
+    { w: 1, sym: "⌃", l: "control", side: "left", hot: true },
+    { w: 1, sym: "⌥", l: "option", side: "left", hot: true },
+    { w: 1.25, sym: "⌘", l: "command", side: "left", hot: true },
+    { w: 5.5, hot: true },
+    { w: 1.25, sym: "⌘", l: "command", side: "right" },
+    { w: 1, sym: "⌥", l: "option", side: "right" },
+    { w: 1, arrow: "◀" }, { w: 1, updown: true }, { w: 1, arrow: "▶" },
+  ],
+];
+const { label = "MacBook keyboard" } = Astro.props;
+---
+<div class="kbwrap">
+  <div class="kb" role="img" aria-label={label} data-led="off" data-backlight="off" data-down="off">
+    <div class="row fnrow" aria-hidden="true">
+      {fnRow.map((key) => (
+        <span class="cell" style={`--w:${key.w}`}>
+          {key.id ? <span class="cap id"><i></i></span>
+            : <span class:list={["cap", "small", key.side === "left" && "left"]}>{key.l}</span>}
+        </span>
+      ))}
+    </div>
+    {rows.map((row) => (
+      <div class="row" aria-hidden="true">
+        {row.map((key) => (
+          <span class="cell" style={`--w:${key.w}`} data-hot={key.hot ? "" : undefined}>
+            {key.updown ? (
+              <span class="ud"><span class="cap half">▲</span><span class="cap half">▼</span></span>
+            ) : key.arrow ? (
+              <span class="cap half low">{key.arrow}</span>
+            ) : (
+              <span class:list={["cap", key.side && "mod", key.side, key.caps && "caps"]}>
+                {key.caps && <i class="led"></i>}
+                {key.t && <span class="top">{key.t}</span>}
+                {key.sym && <span class="sym">{key.sym}</span>}
+                {key.l && <span class:list={["legend", key.t && "bottom"]}>{key.l}</span>}
+              </span>
+            )}
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+<style>
+  .kbwrap { container-type: inline-size; width: 100%; }
+  .kb {
+    --u: calc(100cqw / 15.4);
+    display: grid; padding: calc(var(--u) * 0.2); background: #0a0b0c; border-radius: calc(var(--u) * 0.22);
+    box-shadow: inset 0 2px 6px #000, 0 1px 0 rgb(255 255 255 / 0.4);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font);
+    user-select: none;
+  }
+  .row { display: flex; }
+  .cell { flex: none; width: calc(var(--w) * var(--u)); height: var(--u); padding: calc(var(--u) * 0.04); box-sizing: border-box; }
+  .fnrow .cell { height: calc(var(--u) * 0.66); }
+  .cap {
+    position: relative; display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box;
+    border-radius: calc(var(--u) * 0.12); background: linear-gradient(#27282c, #1b1c1f);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 calc(var(--u) * 0.02) 0 #000;
+    color: #e2e3e6; font-size: calc(var(--u) * 0.36); font-weight: 400; line-height: 1;
+    transition: color 70ms linear, box-shadow 70ms linear, transform 60ms ease;
+  }
+  .cap.small { font-size: calc(var(--u) * 0.2); color: #b6b8be; }
+  .cap.small.left { place-items: center start; padding-left: calc(var(--u) * 0.14); }
+  .cap.mod { font-size: calc(var(--u) * 0.2); color: #cfd0d4; }
+  .cap.mod.left { place-items: end start; padding: 0 0 calc(var(--u) * 0.12) calc(var(--u) * 0.14); }
+  .cap.mod.right { place-items: end end; padding: 0 calc(var(--u) * 0.14) calc(var(--u) * 0.12) 0; }
+  .cap.mod .sym { position: absolute; top: calc(var(--u) * 0.12); left: 0; right: 0; text-align: center; font-size: calc(var(--u) * 0.3); }
+  .cap .top { position: absolute; top: calc(var(--u) * 0.14); left: 0; right: 0; text-align: center; font-size: calc(var(--u) * 0.22); color: #a9abb2; }
+  .cap .legend.bottom { margin-top: calc(var(--u) * 0.2); }
+  .cap.id { background: linear-gradient(#27282c, #1b1c1f); }
+  .cap.id i { height: 58%; width: auto; aspect-ratio: 1; box-sizing: border-box; border-radius: 50%; border: max(1px, calc(var(--u) * 0.022)) solid #34363b; }
+  .ud { display: grid; grid-template-rows: 1fr 1fr; gap: calc(var(--u) * 0.04); height: 100%; }
+  .cap.half { height: 100%; font-size: calc(var(--u) * 0.18); color: #b6b8be; }
+  .cap.low { align-self: end; height: 48%; margin-top: 52%; }
+  .led {
+    position: absolute; left: calc(var(--u) * 0.15); top: calc(var(--u) * 0.15); width: calc(var(--u) * 0.1); height: calc(var(--u) * 0.1);
+    min-width: 3px; min-height: 3px; border-radius: 50%; background: #2d2f33; transition: background 40ms linear, box-shadow 40ms linear;
+  }
+  .kb[data-led="on"] .led { background: var(--led); box-shadow: 0 0 calc(var(--u) * 0.14) var(--led), 0 0 calc(var(--u) * 0.45) rgb(47 214 113 / 0.6); }
+  .kb[data-backlight="on"] .cap { color: #fff; text-shadow: 0 0 calc(var(--u) * 0.16) rgb(255 255 255 / 0.95);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 calc(var(--u) * 0.12) calc(var(--u) * 0.015) rgb(255 255 255 / 0.5); }
+  .kb[data-backlight="on"] .cap .top { color: #fff; }
+  .kb[data-down="on"] [data-hot] .cap { transform: translateY(calc(var(--u) * 0.035)); background: linear-gradient(#383a40, #2b2d32); color: #fff; box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.5), 0 0 calc(var(--u) * 0.25) rgb(255 255 255 / 0.28); }
+</style>

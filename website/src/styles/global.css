@@ -1,0 +1,100 @@
+/* ScreenPulse identity — drawn from the hardware it talks through:
+   aluminium, black keycaps, white backlight, one small green LED. */
+:root {
+  --alu: #e3e5e8;        /* page: anodised aluminium */
+  --alu-deep: #cfd2d7;   /* recesses, rules */
+  --plate: #f4f5f6;      /* raised surfaces */
+  --key: #1a1b1e;        /* keycap black */
+  --key-edge: #2c2e33;
+  --ink: #131417;
+  --muted: #555961;
+  --led: #2fd671;        /* the Caps Lock LED. Used at LED size only. */
+  --led-ink: #0d7a3a;    /* the same green, dark enough for text on aluminium */
+  --legend: #e9eaec;     /* key legends / text on keycap black */
+  --legend-dim: #9a9ea6;
+
+  --font: "Schibsted Grotesk Variable", "Helvetica Neue", Arial, sans-serif;
+  --wrap: 1120px;
+  --gutter: clamp(20px, 5vw, 40px);
+  --r-key: 9px;
+  --r-panel: 14px;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3125rem;
+  --step-2: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --step-3: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --step-4: clamp(2.6rem, 1.5rem + 5.2vw, 5.25rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--alu); color: var(--ink);
+  font: 400 var(--step-0)/1.55 var(--font);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.on-key :focus-visible, .on-key:focus-visible { outline-color: var(--legend); }
+::selection { background: var(--key); color: var(--legend); }
+
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.028em; line-height: 1.04; text-wrap: balance; }
+h1 { font-size: var(--step-4); letter-spacing: -0.04em; line-height: 0.98; }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-1); letter-spacing: -0.015em; line-height: 1.2; }
+p { text-wrap: pretty; }
+.lede { font-size: var(--step-1); line-height: 1.42; color: var(--muted); max-width: 34em; }
+.small { font-size: var(--step--1); color: var(--muted); }
+
+.wrap { width: min(var(--wrap), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.band { padding-block: clamp(72px, 10vw, 136px); }
+.band-key { background: var(--key); color: var(--legend); }
+.band-key .lede, .band-key .small { color: var(--legend-dim); }
+.band-plate { background: var(--plate); }
+.band-head { display: grid; gap: 20px; margin-bottom: clamp(40px, 6vw, 72px); max-width: 46rem; }
+
+.skip { position: absolute; left: 12px; top: -60px; z-index: 100; background: var(--key); color: var(--legend); padding: 10px 14px; border-radius: 8px; }
+.skip:focus { top: 12px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Buttons are keys. The primary one carries the LED. */
+.keybtn {
+  display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 22px;
+  border-radius: var(--r-key); border: 1px solid #000; background: var(--key); color: var(--legend);
+  font-weight: 500; text-decoration: none; cursor: pointer; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 3px 0 #000, 0 6px 14px rgb(19 20 23 / 0.22);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+.keybtn:hover { background: #222327; }
+.keybtn:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 0 0 #000, 0 2px 4px rgb(19 20 23 / 0.2); }
+.keybtn .led { width: 7px; height: 7px; border-radius: 50%; background: var(--led); box-shadow: 0 0 8px var(--led); }
+.keybtn-light {
+  background: var(--plate); color: var(--ink); border-color: #b9bcc2;
+  box-shadow: inset 0 1px 0 #fff, 0 3px 0 #b3b6bd, 0 6px 14px rgb(19 20 23 / 0.1);
+}
+.keybtn-light:hover { background: #fff; }
+.keybtn-light:active { box-shadow: inset 0 1px 0 #fff, 0 0 0 #b3b6bd, 0 2px 4px rgb(19 20 23 / 0.1); }
+.band-key .keybtn { border-color: #3a3c42; background: #26272b; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 3px 0 #0a0a0b; }
+.keybtn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+
+/* Clearly marked placeholder for facts that are not decided yet */
+.tbd { border-bottom: 1px dashed currentColor; }
+
+kbd {
+  font: 500 0.82em/1 var(--font); display: inline-grid; place-items: center; min-width: 1.9em; height: 1.9em; padding: 0 0.5em;
+  border-radius: 6px; background: var(--key); color: var(--legend); box-shadow: 0 2px 0 #000; vertical-align: 0.08em;
+}
+.band-key kbd { background: #2b2d31; box-shadow: 0 2px 0 #08080a; }
+
+/* Blink notation: a row of dots is a letter. */
+.blinks { display: inline-flex; gap: 5px; vertical-align: middle; }
+.blinks i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

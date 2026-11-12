@@ -1,0 +1,278 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import SignalLab from "../components/SignalLab.astro";
+import AnswerWindow from "../components/AnswerWindow.astro";
+import Keyboard from "../components/Keyboard.astro";
+import Logo from "../components/Logo.astro";
+import DmgWindow from "../components/DmgWindow.astro";
+import Footer from "../components/Footer.astro";
+import { site, repoLinks } from "../site";
+
+const features = [
+  { t: "Reads the screen you point at", d: "Press the shortcut and ScreenPulse captures the display your pointer is on, pointer included, so the AI knows which part of the screen you mean." },
+  { t: "Explanatory answers in Normal Mode", d: "Point at a paragraph, an error message, a chart, a form or a question and get a direct answer followed by the reasoning. Type a follow-up to ask about the same screenshot." },
+  { t: "Letter-only answers in Focus Mode", d: "For multiple-choice questions Focus Mode returns just the letter, fast. Content that is not multiple choice gets one short sentence and is never turned into a letter." },
+  { t: "A floating answer window", d: "A compact window that stays above full-screen apps and every desktop. Show it or hide it per mode; ⌃⌥⌘ 0 brings back the last answer either way." },
+  { t: "Caps Lock light signal", d: "The Caps Lock light flickers while the AI thinks, then signals the result: counted blinks for a letter or a number, long lights for yes and no.", note: "Needs a keyboard whose Caps Lock light macOS can control." },
+  { t: "Keyboard backlight signal", d: "On MacBooks with a backlit keyboard the backlight can play the same pattern, which is easier to catch at a glance.", note: "Uses a system interface Apple does not document. It can differ between MacBook models and macOS versions." },
+  { t: "You choose the outputs", d: "Window, Caps Lock light and backlight are separate switches, remembered per mode. Set the blink speed, test every pattern from the menu bar, and your own light settings are restored after each signal." },
+  { t: "Your own reference notes", d: "Drop Markdown files into the Knowledge folder and ScreenPulse hands them to the AI as background for every question." },
+  { t: "At home on macOS", d: "A menu bar app with no Dock icon. Global shortcut, API key in the macOS Keychain, optional start at login, and a build for both Apple silicon and Intel." },
+];
+
+const steps = [
+  { t: "Point", d: "Move the pointer to what you want help with. No selecting, no copying." },
+  { t: "Press ⌃⌥⌘ Space", d: "ScreenPulse captures the display under the pointer and sends that one image to Gemini." },
+  { t: "Wait a moment", d: "The window shows which model is answering. If a light output is on, Caps Lock flickers while the model works." },
+  { t: "Hear back your way", d: "The answer appears in the window, plays on your keyboard lights, or both, depending on the outputs you chose for the mode you are in." },
+];
+
+const faq = [
+  ...(site.signedBuilds ? [] : [{ q: "Why does my Mac say it cannot check ScreenPulse?", a: "Apple lets a Mac skip that warning only for apps that their developer has signed with a paid Apple Developer ID. ScreenPulse is a free spare-time project, so a build may not be signed. When the warning appears, click Done (or OK), not Move to Trash. Then open System Settings, then Privacy & Security, scroll down to Security and click Open Anyway next to the message about ScreenPulse. Confirm with your password or Touch ID. You only need to do this once. The source code is public, and you can build the app yourself instead." }]),
+  { q: "Which Macs does ScreenPulse run on?", a: `ScreenPulse needs ${site.minMacOS} or later and runs on both Apple silicon and Intel Macs. It is made for MacBooks. There is no Windows or Linux version and none is planned.` },
+  { q: "Which MacBook models support the light signals?", a: "The Caps Lock signal works when macOS lets ScreenPulse control the Caps Lock light of your keyboard. The backlight signal needs a MacBook with a backlit keyboard and relies on a system interface Apple does not document, so it can behave differently between models and macOS versions. We are still testing across MacBook models and will publish a compatibility list before launch. The Settings window shows which lights ScreenPulse found on your Mac, and the answer window works on every supported Mac." },
+  { q: "Does it support RGB keyboard lighting?", a: "Not yet. MacBook keyboards have a single-colour backlight, so colour signals would need an external RGB keyboard and support from its maker. We are looking into it, and it is not part of ScreenPulse today." },
+  { q: "What is the difference between Normal Mode and Focus Mode?", a: "Normal Mode is a general screen assistant: it explains what you point at, in full sentences, in the answer window. Focus Mode is deliberately minimal: for a multiple-choice question it returns only the letter, and by default signals it on the keyboard lights. If the content is not multiple choice, Focus Mode gives one short sentence and does not signal a letter. You switch between them in Settings or from the menu bar, and each mode remembers its own outputs." },
+  { q: "What can the keyboard lights tell me?", a: "A letter or a whole number (counted blinks), yes or no (one or two long lights), that an answer is ready to read in the window (two short blinks), or that something went wrong (three quick blinks). Longer answers are not spelled out in light; you read those in the window." },
+  { q: "Which AI does it use?", a: "Google's Gemini models, through an API key you create in Google AI Studio and paste into Settings. You can pick the model there. ScreenPulse needs an internet connection to answer. Like any AI, it can be wrong, so check answers that matter." },
+  { q: "What happens to my screen content?", a: "Nothing is captured until you press the shortcut. Then one image of the display under your pointer is sent from your Mac directly to Google's Gemini API, and the temporary file is deleted. ScreenPulse has no servers of its own and no analytics. Your API key is stored in the macOS Keychain. Everything visible on that display is part of the image, so keep private material off screen when you ask, and see Google's terms for how the Gemini API handles data." },
+  { q: "Is the answer window hidden from screen sharing?", a: "No. It is an ordinary window and shows up in screen sharing and recordings like any other. You can choose not to show it at all, which is a setting for a calmer workspace, not a way around monitoring." },
+  { q: "Can I use ScreenPulse in an exam or a test?", a: "No. ScreenPulse is not made for exams, graded tests, certifications, or any setting where AI help is not allowed. Use it for your own work and learning, and follow the rules that apply where you are." },
+  { q: "How do I get a Gemini API key?", a: "It takes a few minutes and needs only a Google account. The setup guide on this site walks you through it step by step with pictures, and the app has a Check key button that tells you if the key works." },
+  { q: "How do I install it?", a: "Download ScreenPulse.dmg, open it and drag ScreenPulse onto Applications. Then open the app, paste your Gemini API key in Settings, and allow Screen Recording (to capture the screen) and Input Monitoring (to control the Caps Lock light) in System Settings. macOS asks you to confirm Screen Recording again from time to time." },
+  { q: "Is ScreenPulse free?", a: "Yes. ScreenPulse is free and open source under the Apache License 2.0. You only pay Google for the Gemini usage on your own key, and only if your key has billing turned on. The name and logo are not covered by the licence." },
+  { q: "What about updates and support?", a: "ScreenPulse is a spare-time project. New versions are published on GitHub, and the app can tell you when one is out (it asks first, and you can turn it off). You download the new disk image and drag ScreenPulse onto Applications again. Support is community support through GitHub Issues, with no promised response time. A report from the `capsled probe` command on your MacBook helps a lot." },
+];
+const faqLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
+---
+<Base>
+  <Header />
+  <main id="main">
+    <Hero />
+
+    <section id="product" class="band band-plate">
+      <div class="wrap">
+        <div class="band-head">
+          <h2>One shortcut. Two modes. Your choice of output.</h2>
+          <p class="lede">Most AI tools give you a chat window and expect you to come to it. ScreenPulse starts from what is already on your screen, and lets you decide how much answer you want and where it shows up.</p>
+        </div>
+        <div class="duo">
+          <article class="way">
+            <div class="way-art art-window"><AnswerWindow answer="You pay for damage beyond normal use, not for faults the landlord should have fixed." status="Answer · gemini-3.8-flash" /></div>
+            <h3>Normal Mode</h3>
+            <p>The everyday mode. Point at text, an error message, a chart or a question and get an answer that explains itself. It appears in a small window in the top right corner, and takes follow-up questions about the same screenshot.</p>
+          </article>
+          <article class="way">
+            <div class="way-art art-light"><Keyboard label="Keyboard with the Caps Lock light on" /></div>
+            <h3>Focus Mode</h3>
+            <p>The minimal mode. For multiple-choice questions it returns only the letter, quickly, and by default counts it out on the keyboard lights instead of opening a window. Anything that is not multiple choice gets a short sentence, never a made-up letter.</p>
+          </article>
+        </div>
+        <ol class="chain" aria-label="How software, AI and hardware work together">
+          <li><b>Your screen</b><span>One capture of the display under the pointer</span></li>
+          <li><b>Gemini</b><span>Works out what you point at and answers for the mode you chose</span></li>
+          <li><b>ScreenPulse</b><span>Turns the answer into text and, where it fits, a light pattern</span></li>
+          <li><b>Your Mac</b><span>Shows the window, drives the keyboard lights, or both</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="signal" class="band band-key on-key">
+      <div class="wrap">
+        <div class="band-head">
+          <h2>A light you already own, used as a display.</h2>
+          <p class="lede">Letters and numbers are counted out in blinks. Yes is one long light, no is two. Two short blinks mean a longer answer is waiting in the window, and three quick ones mean something went wrong.</p>
+        </div>
+        <SignalLab />
+      </div>
+    </section>
+
+    <section id="features" class="band">
+      <div class="wrap">
+        <div class="band-head">
+          <h2>What ScreenPulse does today</h2>
+        </div>
+        <ul class="features">
+          {features.map((f) => (
+            <li>
+              <h3>{f.t}</h3>
+              <p>{f.d}</p>
+              {f.note && <p class="small">{f.note}</p>}
+            </li>
+          ))}
+        </ul>
+        <div class="later">
+          <h3>Not available yet</h3>
+          <p><b>RGB keyboard lighting.</b> Colour signals on external RGB keyboards are being explored. MacBook keyboards have a single-colour backlight, so this is not part of ScreenPulse today.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="band band-plate">
+      <div class="wrap">
+        <div class="band-head">
+          <h2>How it works</h2>
+          <p class="lede">Set-up takes a few minutes: add your Gemini API key and give ScreenPulse two macOS permissions. After that it is one shortcut.</p>
+        </div>
+        <ol class="steps">
+          {steps.map((s, i) => (
+            <li>
+              <span class="n" aria-hidden="true"><span class="blinks">{Array.from({ length: i + 1 }).map(() => <i />)}</span></span>
+              <h3>{s.t}</h3>
+              <p>{s.d}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section id="get" class="band">
+      <div class="wrap get-grid">
+        <div class="band-head">
+          <h2>Free and open source.</h2>
+          <p class="lede">ScreenPulse costs nothing and has no accounts. Download the installer, drag the app to Applications, and you are done. The code is open under the Apache License 2.0, so you can read it, build it and change it.</p>
+          <DmgWindow />
+        </div>
+        <div class="ticket">
+          <p class="ticket-name"><Logo /></p>
+          <h3>Download for Mac</h3>
+          <p class="small">{site.minMacOS} or later. Apple silicon and Intel.</p>
+          {site.releaseAvailable
+            ? <a class="keybtn" href={repoLinks.dmg}><span class="led"></span>Download ScreenPulse.dmg</a>
+            : <span class="keybtn" aria-disabled="true" role="link">Download comes with the first release</span>}
+          <ol class="inst">
+            <li>Open <b>ScreenPulse.dmg</b> from your Downloads folder.</li>
+            <li>Drag the <b>ScreenPulse</b> icon onto <b>Applications</b>.</li>
+            <li>Open <b>ScreenPulse</b> from Applications or Launchpad.</li>
+            {!site.signedBuilds && <li>The first time, your Mac says it could not verify ScreenPulse. Click <b>Done</b> (or <b>OK</b>), not <b>Move to Trash</b>.</li>}
+            {!site.signedBuilds && <li>Open <b>System Settings</b>, then <b>Privacy &amp; Security</b>. Scroll down to <b>Security</b> and click <b>Open Anyway</b> next to the message about ScreenPulse. Confirm with your password or Touch ID, then click <b>Open Anyway</b> once more.</li>}
+            <li>Add your Gemini key. The <a href="/setup/">setup guide</a> shows how.</li>
+          </ol>
+          {!site.signedBuilds && <p class="note"><b>Why the warning?</b> Apple only skips it for apps signed with a paid Apple Developer ID. ScreenPulse is a free spare-time project and is not signed yet. You only need to do this once.</p>}
+          <details class="build">
+            <summary>Build it yourself instead</summary>
+            <p class="small">You need the Xcode Command Line Tools. An app you build yourself opens without a warning.</p>
+            <pre class="cmd" tabindex="0"><code>git clone {repoLinks.source}.git
+cd ScreenPulse
+./app/build.sh
+open build/ScreenPulse.app</code></pre>
+          </details>
+          <ul>
+            <li>No account, no tracking, no ScreenPulse servers</li>
+            <li>Your own Gemini key, stored in the macOS Keychain</li>
+          </ul>
+          <a class="keybtn keybtn-light" href={repoLinks.source}>Source on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="band band-plate">
+      <div class="wrap faq-grid">
+        <div class="band-head"><h2>Questions</h2></div>
+        <div class="faq">
+          {faq.map((f) => (
+            <details>
+              <summary><span>{f.q}</span></summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+      <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+    </section>
+
+    <section id="about" class="band band-key on-key">
+      <div class="wrap about">
+        <h2>About ScreenPulse</h2>
+        <div class="about-text">
+          <p class="lede">ScreenPulse began with a small observation: a laptop has more ways to tell you something than its screen.</p>
+          <p>AI assistants have mostly settled on one shape, a text box that fills up with paragraphs. That is right for some moments and too much for others. Sometimes you want the full explanation in front of you. Sometimes you want one fact without moving a window.</p>
+          <p>We build ScreenPulse around that choice. The software reads what you point at, the AI works out the answer, and you decide how much of it you want and where it lands: a window, the lights on your keyboard, or both. We want to keep finding new, quieter ways for people and AI to talk to each other, and to be plain about what works on which Mac.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="community" class="band">
+      <div class="wrap community">
+        <div class="band-head">
+          <h2>Questions, bugs and ideas</h2>
+          <p class="lede">ScreenPulse is a spare-time project, built to learn and to make something satisfying. Help and ideas are welcome, with no promise of a quick reply.</p>
+        </div>
+        <ul class="links">
+          <li><a class="keybtn keybtn-light" href={repoLinks.issues}>Open an issue</a><span class="small">Report a bug or ask a question. What you write there is public.</span></li>
+          <li><a class="keybtn keybtn-light" href={repoLinks.source}>Read the code</a><span class="small">Pull requests are welcome.</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+
+<style>
+  .duo { display: grid; gap: clamp(20px, 3vw, 32px); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+  .way { display: grid; gap: 14px; align-content: start; }
+  .way p { color: var(--muted); max-width: 32em; }
+  .way-art { display: grid; place-items: center; min-height: 260px; padding: 28px 16px; border-radius: var(--r-panel); margin-bottom: 8px; overflow: hidden; }
+  .art-window { background: var(--alu); }
+  .art-window :global(.aw-answer) { font-size: 13px; font-weight: 400; letter-spacing: 0; line-height: 1.4; padding: 10px 4px; }
+  .art-light { background: var(--key); }
+  .art-light :global(.kbwrap) { width: min(100%, 440px); }
+  .art-light :global(.kb .led) { background: var(--led); box-shadow: 0 0 6px var(--led), 0 0 18px rgb(47 214 113 / 0.55); }
+
+  .chain { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: clamp(48px, 7vw, 88px); border-top: 1px solid var(--alu-deep); }
+  .chain li { padding: 20px 20px 0 0; display: grid; gap: 4px; position: relative; }
+  .chain li::before { content: ""; position: absolute; top: -4px; left: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+  .chain li:last-child::before { background: var(--led); box-shadow: 0 0 0 3px rgb(47 214 113 / 0.25); }
+  .chain span { color: var(--muted); font-size: 0.9375rem; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0 clamp(28px, 4vw, 56px); }
+  .features li { padding: 26px 0; border-top: 1px solid var(--alu-deep); display: grid; gap: 8px; align-content: start; }
+  .features p { color: var(--muted); }
+  .features .small { color: var(--led-ink); }
+  .later { margin-top: 40px; padding: 24px 26px; border: 1px dashed #9ea2a9; border-radius: var(--r-panel); display: grid; gap: 8px; max-width: 46rem; }
+  .later p { color: var(--muted); }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: clamp(24px, 3vw, 40px); }
+  .steps li { display: grid; gap: 10px; align-content: start; }
+  .steps .n { display: flex; align-items: center; height: 44px; padding: 0 14px; width: max-content; min-width: 44px; border-radius: var(--r-key); background: var(--key); color: var(--led); box-shadow: 0 3px 0 #000; margin-bottom: 8px; }
+  .steps p { color: var(--muted); }
+
+  .get-grid { display: grid; gap: 32px; align-items: start; grid-template-columns: minmax(0, 1fr); }
+  .ticket .keybtn { white-space: normal; text-align: left; padding-block: 12px; }
+  @media (min-width: 900px) { .get-grid { grid-template-columns: 1fr minmax(360px, 460px); } .get-grid .band-head { margin-bottom: 0; } }
+  .inst { display: grid; gap: 8px; counter-reset: i; padding: 4px 0 2px; }
+  .ticket .inst li { position: relative; padding-left: 30px; counter-increment: i; }
+  .ticket .inst li::before { content: counter(i); position: absolute; left: 0; top: 0.1em; width: 22px; height: 22px; border-radius: 6px; background: var(--key); color: var(--legend); display: grid; place-items: center; font-size: 0.75rem; box-shadow: 0 2px 0 #000; }
+  .note { padding: 12px 14px; border-radius: var(--r-key); background: #fbf6e4; border: 1px solid #d9c56b; color: #4a4120; font-size: 0.9375rem; }
+  .build summary { cursor: pointer; font-weight: 500; padding: 6px 0; }
+  .build[open] summary { margin-bottom: 8px; }
+  .cmd { margin: 0; width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px 16px; border-radius: var(--r-key); background: var(--key); color: var(--legend); font: 500 0.875rem/1.6 ui-monospace, "SF Mono", Menlo, monospace; }
+  .ticket { display: grid; gap: 14px; justify-items: start; padding: clamp(24px, 4vw, 36px); background: var(--plate); border-radius: var(--r-panel); border: 1px solid var(--alu-deep); box-shadow: 0 24px 48px -28px rgb(19 20 23 / 0.35); }
+  .ticket ul { display: grid; gap: 8px; padding: 14px 0; border-block: 1px solid var(--alu-deep); width: 100%; }
+  .ticket li { padding-left: 20px; position: relative; }
+  .ticket li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+
+  .faq-grid { display: grid; gap: 8px; }
+  @media (min-width: 900px) { .faq-grid { grid-template-columns: 0.6fr 1fr; } }
+  .faq details { border-top: 1px solid var(--alu-deep); }
+  .faq details:last-child { border-bottom: 1px solid var(--alu-deep); }
+  .faq summary { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 20px 0; cursor: pointer; font-weight: 600; font-size: var(--step-1); letter-spacing: -0.015em; line-height: 1.25; list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--ink); transition: background 120ms; }
+  .faq details[open] summary::after { background: var(--led); border-color: var(--led-ink); }
+  .faq p { padding: 0 32px 24px 0; color: var(--muted); max-width: 40em; }
+
+  .about { display: grid; gap: 28px; }
+  @media (min-width: 900px) { .about { grid-template-columns: 0.6fr 1fr; } }
+  .about-text { display: grid; gap: 20px; max-width: 40em; }
+  .about-text .lede { color: var(--legend); }
+  .about-text p:not(.lede) { color: var(--legend-dim); }
+
+  .community { display: grid; gap: 24px; }
+  .links { display: grid; gap: 16px; }
+  .links li { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+</style>

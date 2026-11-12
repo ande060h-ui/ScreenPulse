@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://screenpulse.vercel.app/sitemap-index.xml

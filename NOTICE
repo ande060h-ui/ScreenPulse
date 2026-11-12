@@ -1,0 +1,13 @@
+ScreenPulse
+Copyright 2026 ScreenPulse authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The name "ScreenPulse", its logo and its icon are not licensed under the Apache
+License. You may use them only to describe the origin of the software, as
+Section 6 of the License provides. Please choose a different name and logo for
+a modified version that you distribute.
+
+Third-party components keep their own licences:
+- Schibsted Grotesk (website font, SIL Open Font License 1.1)
+- Astro and its dependencies (website build tooling, MIT and other permissive licences)

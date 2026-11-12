@@ -1,0 +1,14 @@
+{
+  "name": "screenpulse",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "description": "ScreenPulse — a screen-aware AI assistant for macOS that answers in a floating window or as light signals on your keyboard.",
+  "scripts": {
+    "build:app": "./app/build.sh",
+    "lint": "node --check benchmark/run-benchmark.mjs && node --check benchmark/make-images.mjs && node --check benchmark/summary.mjs && node --check tests/stress.mjs",
+    "website:dev": "npm --prefix website run dev",
+    "website:build": "npm --prefix website run build",
+    "stress": "node tests/stress.mjs"
+  }
+}

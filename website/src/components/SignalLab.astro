@@ -1,0 +1,298 @@
+---
+// The keyboard-signal section: a short looping film of Focus Mode (point → press → think → answer),
+// plus buttons to try the thinking flicker and the letters yourself.
+import Keyboard from "./Keyboard.astro";
+import Logo from "./Logo.astro";
+const options: [string, string][] = [["A", "Red"], ["B", "Purple"], ["C", "Green"], ["D", "Orange"]];
+const steps = ["Point", "Press", "Think", "Answer"];
+const letters = ["A", "B", "C", "D"];
+---
+<div class="lab" data-lab>
+  <div class="film">
+    <figure class="scene" data-scene aria-label="Demo: the pointer moves to a question, Control Option Command Space is pressed, the Caps Lock light flickers while the AI thinks, then the keyboard blinks three times for the answer C.">
+      <div class="screen" aria-hidden="true">
+        <div class="bar"><span class="mb"><Logo size={10} wordmark={false} /></span><i></i><i></i><i></i></div>
+        <div class="quiz" data-quiz>
+          <p class="q">Which colour do you get when you mix blue and yellow?</p>
+          <ul class="opts">
+            {options.map(([l, t]) => <li class:list={[l === "C" && "correct"]}><b>{l}</b><span>{t}</span></li>)}
+          </ul>
+        </div>
+      </div>
+      <div class="deck">
+        <Keyboard label="Keyboard that plays the demo signal" />
+        <div class="chord" data-chord aria-hidden="true"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>Space</kbd></div>
+      </div>
+      <svg class="cursor" data-cursor width="20" height="27" viewBox="0 0 18 24" aria-hidden="true"><path d="M1 1v19l5-4.6 3.3 7.4 3-1.3-3.3-7.3H16z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </figure>
+
+    <ol class="timeline" aria-hidden="true">
+      {steps.map((s, i) => <li data-step={i + 1}><span class="n">{i + 1}</span>{s}</li>)}
+    </ol>
+    <div class="caption-row">
+      <p class="caption" data-caption aria-live="polite">Point at a question.</p>
+      <button type="button" class="toggle" data-toggle aria-pressed="false">Pause</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Try it yourself</h3>
+    <p class="small">Play the signals on the keyboard in the demo. The demo pauses while you do.</p>
+    <div class="letters" role="group" aria-label="Play a signal">
+      <button type="button" class="keybtn think" data-think><span class="flick" aria-hidden="true"></span>Thinking</button>
+      {letters.map((l, i) => (
+        <button type="button" class="keybtn" data-letter={l}>
+          <span>{l}</span>
+          <span class="blinks" aria-hidden="true">{Array.from({ length: i + 1 }).map(() => <i />)}</span>
+          <span class="visually-hidden">{i + 1} {i === 0 ? "blink" : "blinks"}</span>
+        </button>
+      ))}
+    </div>
+    <label class="speed">
+      <span>Blink speed <output data-speed-label>Normal</output></span>
+      <input type="range" min="0.2" max="1.2" step="0.05" value="0.9" data-speed aria-label="Blink speed" />
+    </label>
+    <p class="lab-status" data-lab-status aria-live="polite">Pick a signal.</p>
+  </div>
+</div>
+
+<script>
+  import { playSignal, playThinking, reducedMotion, type SignalHandle } from "../scripts/signal";
+
+  const lab = document.querySelector<HTMLElement>("[data-lab]")!;
+  const scene = lab.querySelector<HTMLElement>("[data-scene]")!;
+  const kb = scene.querySelector<HTMLElement>(".kb")!;
+  const cursor = scene.querySelector<SVGElement>("[data-cursor]")!;
+  const chord = scene.querySelector<HTMLElement>("[data-chord]")!;
+  const quiz = scene.querySelector<HTMLElement>("[data-quiz]")!;
+  const question = quiz.querySelector<HTMLElement>(".q")!;
+  const correct = quiz.querySelector<HTMLElement>(".correct")!;
+  const caption = lab.querySelector<HTMLElement>("[data-caption]")!;
+  const toggle = lab.querySelector<HTMLButtonElement>("[data-toggle]")!;
+  const stepEls = [...lab.querySelectorAll<HTMLElement>("[data-step]")];
+  const status = lab.querySelector<HTMLElement>("[data-lab-status]")!;
+  const speed = lab.querySelector<HTMLInputElement>("[data-speed]")!;
+  const speedLabel = lab.querySelector<HTMLElement>("[data-speed-label]")!;
+  const thinkBtn = lab.querySelector<HTMLButtonElement>("[data-think]")!;
+
+  const wait = (ms: number, signal: AbortSignal) =>
+    new Promise<void>((resolve, reject) => {
+      const t = setTimeout(resolve, ms);
+      signal.addEventListener("abort", () => { clearTimeout(t); reject(new Error("cancelled")); }, { once: true });
+    });
+
+  // ---------- the film ----------
+  let demo: AbortController | null = null;
+  let handle: SignalHandle | null = null;
+  let playing = false;
+  let userPaused = false;
+  let inView = false;
+  let target: "start" | "question" = "start";
+
+  function setStep(n: number) {
+    stepEls.forEach((el, i) => { el.dataset.state = i + 1 < n ? "done" : i + 1 === n ? "active" : ""; });
+  }
+  function moveCursor(to: "start" | "question", instant = false) {
+    target = to;
+    const s = scene.getBoundingClientRect();
+    let x: number, y: number;
+    if (to === "question") {
+      const r = question.getBoundingClientRect();
+      x = r.left - s.left + r.width * 0.58; y = r.top - s.top + r.height * 0.45;
+    } else {
+      const r = quiz.getBoundingClientRect();
+      x = r.right - s.left - 34; y = r.bottom - s.top - 18;
+    }
+    cursor.classList.toggle("instant", instant);
+    cursor.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+  }
+  function reset(instant = false) {
+    handle?.cancel(); handle = null;
+    kb.dataset.led = "off"; kb.dataset.backlight = "off"; kb.dataset.down = "off";
+    quiz.classList.remove("pointed"); correct.classList.remove("revealed"); chord.classList.remove("show");
+    setStep(0); moveCursor("start", instant);
+  }
+  function finalFrame() {
+    reset(true); moveCursor("question", true);
+    quiz.classList.add("pointed"); correct.classList.add("revealed");
+    stepEls.forEach((el) => (el.dataset.state = "done"));
+    caption.textContent = "Point, press ⌃⌥⌘ Space, Caps Lock flickers while the AI thinks, then three blinks mean C.";
+  }
+
+  async function loop(signal: AbortSignal) {
+    while (!signal.aborted) {
+      reset();
+      caption.textContent = "Point at a question.";
+      await wait(900, signal);
+      setStep(1); moveCursor("question");
+      await wait(1250, signal);
+      quiz.classList.add("pointed");
+      await wait(450, signal);
+
+      setStep(2); caption.textContent = "Press ⌃ ⌥ ⌘ Space.";
+      chord.classList.add("show");
+      await wait(280, signal);
+      kb.dataset.down = "on";
+      await wait(620, signal);
+      kb.dataset.down = "off";
+      await wait(260, signal);
+      chord.classList.remove("show");
+
+      const h = playSignal(kb, { kind: "letters", value: "C" }, {
+        unit: 360, thinkMs: 2200,
+        onPhase(phase, n) {
+          if (phase === "thinking") { setStep(3); caption.textContent = "Caps Lock flickers while the AI thinks."; }
+          if (phase === "pause") caption.textContent = "The answer is ready…";
+          if (phase === "blink") { setStep(4); caption.textContent = `Caps Lock and the backlight blink: ${n} of 3.`; }
+        },
+      });
+      handle = h;
+      const ok = await h.done;
+      if (!ok || signal.aborted) return;
+      correct.classList.add("revealed");
+      stepEls.forEach((el) => (el.dataset.state = "done"));
+      caption.textContent = "Three blinks: the answer is C. Your lights go back to how you had them.";
+      await wait(3400, signal);
+    }
+  }
+
+  function play() {
+    if (playing) return;
+    playing = true;
+    toggle.textContent = "Pause"; toggle.setAttribute("aria-pressed", "false");
+    demo = new AbortController();
+    loop(demo.signal).catch(() => {});
+  }
+  function pause(label = "Play demo") {
+    playing = false;
+    demo?.abort(); demo = null;
+    handle?.cancel(); handle = null;
+    toggle.textContent = label; toggle.setAttribute("aria-pressed", "true");
+  }
+
+  toggle.addEventListener("click", () => {
+    if (playing) { userPaused = true; pause(); finalFrame(); }
+    else { userPaused = false; play(); }
+  });
+
+  if (reducedMotion()) { pause(); finalFrame(); }
+  else {
+    reset(true);
+    new IntersectionObserver((entries) => {
+      inView = entries.some((e) => e.isIntersecting);
+      if (inView && !userPaused) play();
+      else if (!inView && playing) { pause(); reset(true); }
+    }, { threshold: 0.35 }).observe(scene);
+  }
+  addEventListener("resize", () => moveCursor(target, true));
+
+  // ---------- try it yourself ----------
+  let manual: SignalHandle | null = null;
+  const label = (v: number) => (v < 0.35 ? "Fast" : v < 0.7 ? "Normal" : v < 1.0 ? "Slow" : "Very slow");
+  const seconds = () => 1.4 - Number(speed.value);
+  speed.addEventListener("input", () => { speedLabel.textContent = label(seconds()); });
+
+  function takeOver() {
+    userPaused = true;
+    if (playing) pause();
+    manual?.cancel();
+    thinkBtn.classList.remove("active");
+    kb.dataset.down = "off"; chord.classList.remove("show");
+    caption.textContent = "Demo paused while you try the signals.";
+  }
+
+  thinkBtn.addEventListener("click", () => {
+    takeOver();
+    thinkBtn.classList.add("active");
+    status.textContent = "Thinking: Caps Lock flickers until the answer arrives.";
+    manual = playThinking(kb, 3200, () => {
+      status.textContent = "In the app, the answer follows right after.";
+    });
+    manual.done.then(() => thinkBtn.classList.remove("active"));
+  });
+
+  lab.querySelectorAll<HTMLButtonElement>("[data-letter]").forEach((b) => b.addEventListener("click", () => {
+    takeOver();
+    const letter = b.dataset.letter!;
+    const n = letter.charCodeAt(0) - 64;
+    manual = playSignal(kb, { kind: "letters", value: letter }, {
+      unit: seconds() * 1000, thinkMs: 900,
+      onPhase(phase, i) {
+        if (phase === "thinking") status.textContent = "Thinking: Caps Lock flickers.";
+        if (phase === "pause") status.textContent = "Pause.";
+        if (phase === "blink") status.textContent = `Blink ${i} of ${n}.`;
+        if (phase === "done") status.textContent = `${n} ${n === 1 ? "blink" : "blinks"} = ${letter}. Lights are back to how you had them.`;
+      },
+    });
+  }));
+</script>
+
+<style>
+  .lab { display: grid; gap: clamp(32px, 5vw, 64px); align-items: start; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 960px) { .lab { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); } }
+
+  /* ---------- scene ---------- */
+  .film { display: grid; gap: 0; }
+  .scene { --gap: clamp(40px, 5vw, 52px); position: relative; margin: 0; display: grid; gap: var(--gap); }
+  .screen { border-radius: 14px; overflow: hidden; background: #f5f5f7; border: 8px solid #050607; box-shadow: 0 0 0 1px #2c2e33, 0 30px 60px -30px rgb(0 0 0 / 0.8); }
+  .bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; height: 20px; padding: 0 10px; background: rgb(19 20 23 / 0.06); }
+  .bar i { width: 13px; height: 4px; border-radius: 3px; background: rgb(19 20 23 / 0.22); }
+  .mb { margin-right: auto; color: var(--ink); display: flex; }
+  .quiz { margin: clamp(10px, 2vw, 16px); padding: clamp(14px, 2.6vw, 22px); border-radius: 12px; transition: background 260ms ease, box-shadow 260ms ease; }
+  .quiz.pointed { background: rgb(19 20 23 / 0.035); box-shadow: inset 0 0 0 1px rgb(19 20 23 / 0.06); }
+  .q { color: #131417; font-weight: 600; font-size: clamp(0.95rem, 0.8rem + 0.6vw, 1.15rem); letter-spacing: -0.015em; line-height: 1.3; margin-bottom: 14px; max-width: 30ch; }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opts li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: #fff; border: 1px solid #dcdde1; color: #2a2c31; font-size: clamp(0.85rem, 0.78rem + 0.3vw, 0.95rem); transition: border-color 300ms ease, box-shadow 300ms ease; }
+  .opts b { font-weight: 600; color: #8a8d94; }
+  .opts li.revealed { border-color: var(--led); box-shadow: 0 0 0 3px rgb(47 214 113 / 0.22); }
+  .opts li.revealed::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--led); box-shadow: 0 0 8px var(--led); }
+
+  .deck { position: relative; }
+  .deck :global(.kb) { box-shadow: inset 0 2px 6px #000, 0 0 0 1px #2c2e33; }
+  .chord {
+    position: absolute; left: 50%; top: calc(var(--gap) / -2); display: flex; gap: 6px; padding: 7px 9px; border-radius: 12px;
+    background: rgb(28 29 33 / 0.94); border: 1px solid #3a3c42; box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+    opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(0.96); transition: opacity 180ms ease, transform 220ms cubic-bezier(.2, .8, .2, 1); pointer-events: none;
+  }
+  .chord.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .chord kbd { min-width: 2.1em; height: 2.1em; font-size: 0.85rem; }
+
+  .cursor { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
+    transition: transform 1150ms cubic-bezier(.45, .05, .2, 1); will-change: transform; }
+  .cursor.instant { transition: none; }
+
+  /* ---------- timeline + caption ---------- */
+  .timeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
+  .timeline li { display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 2px solid #2c2e33; color: var(--legend-dim); font-size: 0.9375rem; transition: color 200ms ease, border-color 200ms ease; }
+  .timeline .n { display: grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: 6px; background: #26272b; color: var(--legend-dim); font-size: 0.75rem; transition: background 200ms ease, color 200ms ease; }
+  .timeline li[data-state="active"] { color: var(--legend); border-top-color: var(--led); }
+  .timeline li[data-state="active"] .n { background: var(--led); color: #06210f; }
+  .timeline li[data-state="done"] { color: #c9cbd0; border-top-color: #5a5d63; }
+  .caption-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-top: 12px; }
+  .caption { color: var(--legend); font-size: 1.0625rem; min-height: 3.2em; max-width: 36em; }
+  .toggle { flex: none; background: none; border: 1px solid #3a3c42; color: var(--legend-dim); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.875rem; }
+  .toggle:hover { color: var(--legend); border-color: #5a5d63; }
+
+  /* ---------- try it yourself ---------- */
+  .panel { display: grid; gap: 16px; justify-items: start; }
+  @media (min-width: 960px) { .panel { position: sticky; top: 100px; } }
+  .letters { display: flex; flex-wrap: wrap; gap: 10px; }
+  .letters .keybtn { min-height: 54px; padding: 0 16px; gap: 10px; }
+  .letters .blinks i { background: var(--led); width: 6px; height: 6px; }
+  .think .flick { width: 8px; height: 8px; border-radius: 50%; background: #3a3c42; }
+  .think.active .flick { background: var(--led); box-shadow: 0 0 8px var(--led); animation: flick 90ms steps(2, jump-none) infinite; }
+  @keyframes flick { 0% { opacity: 1; } 100% { opacity: 0.15; } }
+  .speed { display: grid; gap: 8px; width: min(100%, 320px); font-size: 0.9375rem; }
+  .speed span { display: flex; justify-content: space-between; }
+  .speed output { color: var(--legend-dim); }
+  .speed input { width: 100%; accent-color: var(--legend); height: 28px; }
+  .lab-status { min-height: 3.2em; color: var(--legend-dim); font-size: 0.9375rem; }
+  @media (prefers-reduced-motion: reduce) { .think.active .flick { animation: none; } .cursor { transition: none; } }
+  @media (max-width: 560px) {
+    .timeline { gap: 6px; }
+    .timeline li { font-size: 0.8125rem; gap: 6px; }
+    .caption { font-size: 1rem; }
+    .chord { gap: 4px; padding: 5px 6px; border-radius: 10px; }
+    .chord kbd { min-width: 1.9em; height: 1.9em; font-size: 0.75rem; }
+  }
+</style>

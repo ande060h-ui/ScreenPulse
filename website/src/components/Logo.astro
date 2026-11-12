@@ -1,0 +1,18 @@
+---
+// The mark: rows of one, two and three dots — the blink code for A, B and C. The first dot is lit.
+const { size = 22, wordmark = true } = Astro.props;
+---
+<span class="logo">
+  <svg width={size} height={size} viewBox="0 0 22 22" aria-hidden="true">
+    <circle cx="3" cy="3" r="3" fill="var(--led)" />
+    <g fill="currentColor">
+      <circle cx="3" cy="11" r="3" /><circle cx="11" cy="11" r="3" />
+      <circle cx="3" cy="19" r="3" /><circle cx="11" cy="19" r="3" /><circle cx="19" cy="19" r="3" />
+    </g>
+  </svg>
+  {wordmark && <span class="word">ScreenPulse</span>}
+</span>
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 11px; }
+  .word { font-weight: 600; font-size: 1.125rem; letter-spacing: -0.03em; }
+</style>

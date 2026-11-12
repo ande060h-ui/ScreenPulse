@@ -1,0 +1,141 @@
+---
+import Keyboard from "./Keyboard.astro";
+import AnswerWindow from "./AnswerWindow.astro";
+import Logo from "./Logo.astro";
+import { site } from "../site";
+---
+<section class="hero">
+  <div class="wrap grid">
+    <div class="copy">
+      <h1>Ask your screen. Hear back your way.</h1>
+      <p class="lede">{site.description}</p>
+      <div class="cta">
+        <a class="keybtn" href="#get"><span class="led"></span>Get ScreenPulse</a>
+        <a class="keybtn keybtn-light" href="#product">See how it answers</a>
+      </div>
+      <p class="small">For MacBook. {site.minMacOS} or later. Free and open source.</p>
+    </div>
+
+    <div class="stage" data-demo data-mode="normal">
+      <div class="screen" aria-hidden="true">
+        <div class="menubar"><span></span><span></span><span></span><span class="mb-icon"><Logo size={11} wordmark={false} /></span></div>
+        <div class="doc doc-normal">
+          <p class="q">Rental agreement, section 7</p>
+          <p class="para">The Tenant shall be liable for any deterioration of the premises exceeding fair wear and tear, save where such deterioration arises from a defect the Landlord was obliged to remedy.</p>
+          <svg class="pointer" width="18" height="24" viewBox="0 0 18 24"><path d="M1 1v19l5-4.6 3.3 7.4 3-1.3-3.3-7.3H16z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="doc doc-focus">
+          <p class="q">Which planet has the shortest day?</p>
+          <ul>
+            <li><b>A</b> Mars</li>
+            <li><b>B</b> Jupiter</li>
+            <li><b>C</b> Venus</li>
+            <li><b>D</b> Neptune</li>
+          </ul>
+          <svg class="pointer" width="18" height="24" viewBox="0 0 18 24"><path d="M1 1v19l5-4.6 3.3 7.4 3-1.3-3.3-7.3H16z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="window"><AnswerWindow answer="" status="Thinking… · gemini-3.8-flash" /></div>
+      </div>
+      <div class="hinge" aria-hidden="true"></div>
+      <div class="deck"><Keyboard label="MacBook keyboard. The Caps Lock light and the backlight show the signal." /><div class="trackpad" aria-hidden="true"></div></div>
+
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Choose which mode the demo shows">
+          <button type="button" data-set-mode="normal" aria-pressed="true">Normal Mode</button>
+          <button type="button" data-set-mode="focus" aria-pressed="false">Focus Mode</button>
+        </div>
+        <p class="caption" data-caption aria-live="polite">Normal Mode explains what you point at.</p>
+        <button type="button" class="replay" data-replay>Play again</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { playSignal, reducedMotion, type SignalHandle } from "../scripts/signal";
+  const demo = document.querySelector<HTMLElement>("[data-demo]")!;
+  const kb = demo.querySelector<HTMLElement>(".kb")!;
+  const caption = demo.querySelector<HTMLElement>("[data-caption]")!;
+  const status = demo.querySelector<HTMLElement>("[data-aw-status]")!;
+  const answer = demo.querySelector<HTMLElement>("[data-aw-answer]")!;
+  const buttons = demo.querySelectorAll<HTMLButtonElement>("[data-set-mode]");
+  let handle: SignalHandle | null = null;
+  let timer = 0;
+
+  const EXPLANATION = "You pay for damage beyond normal use. You do not pay for damage caused by something the landlord should have fixed.";
+
+  function run() {
+    handle?.cancel(); clearTimeout(timer);
+    kb.dataset.led = "off"; kb.dataset.backlight = "off";
+    demo.dataset.state = "asking";
+    if (!reducedMotion()) { kb.dataset.down = "on"; window.setTimeout(() => { kb.dataset.down = "off"; }, 420); }
+    if (demo.dataset.mode === "normal") {
+      status.textContent = "Thinking… · gemini-3.8-flash"; answer.textContent = "";
+      caption.textContent = "⌃⌥⌘ Space pressed. ScreenPulse reads the screen under the pointer.";
+      timer = window.setTimeout(() => {
+        status.textContent = "Answer · gemini-3.8-flash"; answer.textContent = EXPLANATION;
+        caption.textContent = "Normal Mode: an explanation in a small window, top right.";
+        demo.dataset.state = "done";
+      }, reducedMotion() ? 0 : 1700);
+      return;
+    }
+    if (reducedMotion()) { caption.textContent = "Focus Mode: two blinks on Caps Lock means B."; demo.dataset.state = "done"; return; }
+    handle = playSignal(kb, { kind: "letters", value: "B" }, {
+      onPhase(phase, n) {
+        if (phase === "thinking") caption.textContent = "⌃⌥⌘ Space pressed. Caps Lock flickers while the AI thinks.";
+        if (phase === "blink") caption.textContent = `Blink ${n} of 2.`;
+        if (phase === "done") { caption.textContent = "Focus Mode: two blinks means B. No window opened."; demo.dataset.state = "done"; }
+      },
+    });
+  }
+
+  buttons.forEach((b) => b.addEventListener("click", () => {
+    demo.dataset.mode = b.dataset.setMode!;
+    buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    run();
+  }));
+  demo.querySelector("[data-replay]")!.addEventListener("click", run);
+  window.setTimeout(run, 900);
+</script>
+
+<style>
+  .hero { padding-block: clamp(40px, 7vw, 96px) clamp(64px, 9vw, 120px); overflow: hidden; }
+  .grid { display: grid; gap: clamp(40px, 6vw, 72px); align-items: center; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1000px) { .grid { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr); } }
+  .copy { display: grid; gap: 26px; justify-items: start; }
+  .cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
+
+  /* The stage is a MacBook seen from above: display, then the keyboard deck. */
+  .stage { display: grid; justify-items: center; }
+  .screen { position: relative; width: 100%; max-width: 600px; aspect-ratio: 16 / 10; border-radius: 18px 18px 0 0; background: #f7f7f8;
+    border: 10px solid #0c0d0f; border-bottom-width: 14px; box-shadow: 0 30px 60px -30px rgb(19 20 23 / 0.5); overflow: hidden; }
+  .hinge { width: 100%; max-width: 600px; height: clamp(7px, 1.4vw, 10px); background: linear-gradient(#2a2b2f, #8d9096 45%, #b9bcc1); }
+  .menubar { display: flex; justify-content: flex-end; align-items: center; gap: 9px; height: 20px; padding: 0 10px; background: rgb(19 20 23 / 0.06); }
+  .menubar > span:not(.mb-icon) { width: 14px; height: 5px; border-radius: 3px; background: rgb(19 20 23 / 0.22); }
+  .mb-icon { order: -1; }
+  .doc { position: relative; padding: clamp(14px, 4%, 26px) clamp(16px, 6%, 34px); max-width: 62%; }
+  .q { font-weight: 600; font-size: clamp(13px, 2.9vw, 17px); letter-spacing: -0.015em; margin-bottom: 12px; }
+  .doc li { display: flex; gap: 10px; align-items: center; padding: 6px 10px; margin-bottom: 6px; border: 1px solid var(--alu-deep); border-radius: 8px; font-size: clamp(11.5px, 2.4vw, 14px); background: #fff; }
+  .doc li b { font-weight: 600; color: var(--muted); }
+  .pointer { position: absolute; left: 58%; top: 17%; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3)); }
+  .window { position: absolute; right: 10px; top: 30px; opacity: 0; transform: translateY(-6px) scale(0.98); transform-origin: top right; transition: opacity 180ms ease-out, transform 180ms ease-out; }
+  .stage[data-mode="normal"] .window { opacity: 1; transform: none; }
+  .stage[data-mode="normal"] .doc-focus, .stage[data-mode="focus"] .doc-normal { display: none; }
+  .para { font-size: clamp(11.5px, 2.4vw, 14px); line-height: 1.5; color: #2a2c31; }
+  .doc-normal { max-width: 52%; }
+  @media (max-width: 520px) { .doc-normal { max-width: 47%; padding-right: 0; } .doc-normal .para { font-size: 10px; } .doc-normal .q { font-size: 12px; } }
+  .doc-normal .pointer { left: 38%; top: 52%; }
+  .window :global(.aw-answer) { font-size: 12.5px; font-weight: 400; letter-spacing: 0; line-height: 1.4; padding: 10px 4px; }
+  @media (max-width: 520px) { .window { transform-origin: top right; scale: 0.8; } }
+  .trackpad { width: 36%; aspect-ratio: 2.1; border-radius: 10px; background: linear-gradient(#cdd0d4, #c3c6cb); box-shadow: inset 0 0 0 1px rgb(19 20 23 / 0.1), inset 0 1px 0 rgb(255 255 255 / 0.5); }
+  .deck { width: 100%; max-width: 600px; display: grid; justify-items: center; gap: clamp(10px, 2.4vw, 18px); padding: clamp(12px, 2.4vw, 20px) clamp(10px, 2vw, 18px) clamp(14px, 3vw, 24px);
+    position: relative; background: linear-gradient(#d6d8dc, #c3c6cb); border-radius: 0 0 22px 22px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 24px 40px -24px rgb(19 20 23 / 0.45); }
+  .deck::after { content: ""; position: absolute; bottom: 0; left: 50%; width: 18%; height: 5px; transform: translateX(-50%); border-radius: 6px 6px 0 0; background: rgb(19 20 23 / 0.1); box-shadow: inset 0 1px 1px rgb(19 20 23 / 0.15); }
+
+  .controls { display: grid; justify-items: center; gap: 12px; margin-top: 26px; text-align: center; }
+  .seg { display: inline-flex; padding: 4px; gap: 4px; border-radius: 12px; background: var(--alu-deep); }
+  .seg button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 9px; background: transparent; cursor: pointer; font-size: 0.9375rem; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--plate); color: var(--ink); box-shadow: 0 1px 2px rgb(19 20 23 / 0.2); }
+  .caption { min-height: 1.6em; font-size: 0.9375rem; color: var(--muted); }
+  .replay { border: 0; background: none; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; font-size: 0.9375rem; padding: 6px; }
+</style>

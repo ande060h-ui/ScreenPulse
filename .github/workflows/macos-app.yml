@@ -1,0 +1,58 @@
+name: macOS app
+
+on:
+  push:
+    paths: ["app/**", "scripts/**", "package.json", ".github/workflows/macos-app.yml"]
+  pull_request:
+    paths: ["app/**", "scripts/**", "package.json", ".github/workflows/macos-app.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swiftc --version
+      - name: Unit tests (Core logic)
+        run: ./app/test.sh
+      - name: Build (release, ad-hoc signed, universal)
+        run: ./app/build.sh --release
+      - name: Verify bundle
+        run: |
+          plutil -lint build/ScreenPulse.app/Contents/Info.plist
+          codesign --verify --deep --strict --verbose=2 build/ScreenPulse.app
+          lipo -archs build/ScreenPulse.app/Contents/MacOS/ScreenPulse
+          lipo -archs build/capsled
+          build/capsled --help
+      - name: Probe smoke test (the runner has no keyboard lights; this only checks that it runs)
+        run: build/capsled probe
+      - name: Disk image (unsigned)
+        run: SKIP_BUILD=1 ./scripts/make-dmg.sh
+      - name: Verify disk image
+        run: |
+          hdiutil verify build/ScreenPulse.dmg
+          MNT="$(mktemp -d)"
+          hdiutil attach build/ScreenPulse.dmg -nobrowse -readonly -mountpoint "$MNT"
+          ls -la "$MNT"
+          test -d "$MNT/ScreenPulse.app"
+          test -L "$MNT/Applications"
+          test -f "$MNT/.DS_Store"
+          # The window background must be a single 660x400 image (a 1x/2x TIFF showed at double size in Finder)
+          test -f "$MNT/.background.png"
+          test ! -e "$MNT/.background.tiff"
+          sips -g pixelWidth -g pixelHeight "$MNT/.background.png"
+          test "$(sips -g pixelWidth "$MNT/.background.png" | awk '/pixelWidth/{print $2}')" = 660
+          test "$(sips -g pixelHeight "$MNT/.background.png" | awk '/pixelHeight/{print $2}')" = 400
+          codesign --verify --deep --strict "$MNT/ScreenPulse.app"
+          hdiutil detach "$MNT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ScreenPulse-dmg-unsigned
+          path: |
+            build/ScreenPulse.dmg
+            build/ScreenPulse.dmg.sha256
+          retention-days: 14

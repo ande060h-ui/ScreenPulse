@@ -1,0 +1,602 @@
+[
+ {
+  "n": 1,
+  "q": "Which of the following is NOT a value of the Agile Manifesto?",
+  "opts": [
+   "Individuals and interactions over processes and tools",
+   "Customer collaboration over contract negotiation",
+   "Following a plan over responding to change",
+   "Working software over comprehensive documentation"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 2,
+  "q": "Which is a typical characteristic of the Waterfall model?",
+  "opts": [
+   "Work is delivered in short iterations",
+   "Phases are completed sequentially",
+   "Requirements are expected to change often",
+   "The customer reviews the product every sprint"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 3,
+  "q": "Which of the following is NOT an Agile method?",
+  "opts": [
+   "Kanban",
+   "Extreme Programming",
+   "PRINCE2",
+   "Crystal"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 4,
+  "q": "Which three pillars support empirical process control?",
+  "opts": [
+   "Planning, Execution, Review",
+   "Transparency, Inspection, Adaptation",
+   "Vision, Value, Velocity",
+   "Commitment, Courage, Focus"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 5,
+  "q": "A Sprint typically lasts:",
+  "opts": [
+   "1 to 6 weeks",
+   "1 to 3 days",
+   "2 to 3 months",
+   "Until the backlog is empty"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 6,
+  "q": "What is the recommended size of a Scrum Team?",
+  "opts": [
+   "2 to 4 members",
+   "6 to 10 members",
+   "12 to 15 members",
+   "Any size, as long as it is self-organized"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 7,
+  "q": "Which principle limits the time spent on an activity to a fixed duration?",
+  "opts": [
+   "Time-boxing",
+   "Collaboration",
+   "Iterative Development",
+   "Self-organization"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 8,
+  "q": "Team members decide for themselves how to do the work. Which principle is this?",
+  "opts": [
+   "Value-based Prioritization",
+   "Self-organization",
+   "Time-boxing",
+   "Empirical Process Control"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 9,
+  "q": "Value-based Prioritization means that:",
+  "opts": [
+   "The cheapest items are done first",
+   "The easiest items are done first",
+   "The items delivering the most value are done first",
+   "Items are done in the order they were requested"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 10,
+  "q": "Which principle recognizes that the customer’s understanding grows as the product is built, so work is delivered in increments?",
+  "opts": [
+   "Collaboration",
+   "Time-boxing",
+   "Iterative Development",
+   "Self-organization"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 11,
+  "q": "Which is NOT one of the Scrum principles?",
+  "opts": [
+   "Empirical Process Control",
+   "Collaboration",
+   "Predictive Planning",
+   "Iterative Development"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 12,
+  "q": "Which are the core Scrum roles?",
+  "opts": [
+   "Product Owner, Scrum Master, Scrum Team",
+   "Product Owner, Stakeholders, Vendors",
+   "Scrum Master, Scrum Guidance Body, Scrum Team",
+   "Project Manager, Product Owner, Scrum Team"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 13,
+  "q": "Who is responsible for maximizing business value and for the Prioritized Product Backlog?",
+  "opts": [
+   "Scrum Master",
+   "Scrum Team",
+   "Product Owner",
+   "Scrum Guidance Body"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 14,
+  "q": "The Scrum Master is best described as:",
+  "opts": [
+   "A project manager who assigns tasks",
+   "A servant leader who facilitates and removes impediments",
+   "The person who approves all deliverables",
+   "The person who prioritizes the backlog"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 15,
+  "q": "Which is a non-core role?",
+  "opts": [
+   "Product Owner",
+   "Scrum Master",
+   "Scrum Team",
+   "Scrum Guidance Body"
+  ],
+  "key": "D",
+  "wrong": "A"
+ },
+ {
+  "n": 16,
+  "q": "Who is called the “Voice of the Customer”?",
+  "opts": [
+   "Scrum Master",
+   "Product Owner",
+   "Vendor",
+   "Chief Scrum Master"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 17,
+  "q": "What is the Scrum Team responsible for?",
+  "opts": [
+   "Approving changes to the Product Backlog",
+   "Defining the project vision",
+   "Understanding user stories, estimating, and creating the deliverables",
+   "Deciding which stakeholders are invited"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 18,
+  "q": "Which of the following is used to assess the business justification of a project?",
+  "opts": [
+   "Return on Investment (ROI)",
+   "Velocity",
+   "Sprint Burndown Chart",
+   "Planning Poker"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 19,
+  "q": "In MoSCoW prioritization, what does “M” stand for?",
+  "opts": [
+   "Maybe have",
+   "Must have",
+   "Minimum viable",
+   "Measured"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 20,
+  "q": "Which is a value-based prioritization technique?",
+  "opts": [
+   "Planning Poker",
+   "Scrumboard",
+   "Paired Comparison",
+   "Daily Standup"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 21,
+  "q": "What defines when a user story is considered complete by the Scrum Team?",
+  "opts": [
+   "Done Criteria",
+   "Acceptance Criteria set by the customer only",
+   "Release Planning Schedule",
+   "Sprint Backlog"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 22,
+  "q": "Who defines the Acceptance Criteria used to accept or reject a deliverable?",
+  "opts": [
+   "Scrum Master",
+   "Product Owner",
+   "Scrum Guidance Body",
+   "Vendor"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 23,
+  "q": "Which practice most directly reduces the cost of rework?",
+  "opts": [
+   "Detailed upfront documentation",
+   "Fewer team meetings",
+   "Frequent validation of deliverables in Sprint Review",
+   "Longer Sprints"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 24,
+  "q": "A major change is requested in the middle of a Sprint. What is the best approach?",
+  "opts": [
+   "Add it to the current Sprint immediately",
+   "Add it to the Prioritized Product Backlog for a future Sprint",
+   "Cancel the project",
+   "Ask the Scrum Team to work overtime"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 25,
+  "q": "Who approves changes to the Prioritized Product Backlog?",
+  "opts": [
+   "Product Owner",
+   "Scrum Master",
+   "Stakeholders",
+   "Scrum Team"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 26,
+  "q": "Which statement best reflects Scrum’s attitude toward change?",
+  "opts": [
+   "Change should be avoided after the vision is set",
+   "Change is handled through a formal change control board",
+   "Change is welcomed and handled through short iterations",
+   "Change is only allowed between releases"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 27,
+  "q": "How is risk exposure calculated?",
+  "opts": [
+   "Probability x Impact",
+   "Cost x Time",
+   "Velocity x Effort",
+   "Value / Cost"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 28,
+  "q": "Who can identify risks in Scrum?",
+  "opts": [
+   "Only the Scrum Master",
+   "Only the Product Owner",
+   "Only the Scrum Guidance Body",
+   "Anyone involved in the project"
+  ],
+  "key": "D",
+  "wrong": "A"
+ },
+ {
+  "n": 29,
+  "q": "What is the difference between a risk and an issue?",
+  "opts": [
+   "A risk is certain to happen, an issue is not",
+   "A risk is a possible event, an issue is an event that has occurred or is certain",
+   "They mean the same",
+   "An issue only concerns the budget"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 30,
+  "q": "How many processes are there in Scrum according to SBOK?",
+  "opts": [
+   "12",
+   "15",
+   "19",
+   "25"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 31,
+  "q": "What is the key output of the Create Project Vision process?",
+  "opts": [
+   "Project Vision Statement",
+   "Prioritized Product Backlog",
+   "Sprint Backlog",
+   "Release Planning Schedule"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 32,
+  "q": "In which process are the Scrum Master and stakeholders identified?",
+  "opts": [
+   "Form Scrum Team",
+   "Create Project Vision",
+   "Identify Scrum Master and Stakeholder(s)",
+   "Develop Epic(s)"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 33,
+  "q": "What is an Epic?",
+  "opts": [
+   "A completed Sprint",
+   "A large, high-level user story written early with little detail",
+   "A list of risks",
+   "A task estimated in hours"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 34,
+  "q": "In which process are the Done Criteria established?",
+  "opts": [
+   "Create Prioritized Product Backlog",
+   "Create Deliverables",
+   "Retrospect Sprint",
+   "Ship Deliverables"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 35,
+  "q": "What is the main output of Conduct Release Planning?",
+  "opts": [
+   "Sprint Backlog",
+   "Release Planning Schedule",
+   "Task List",
+   "Burndown Chart"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 36,
+  "q": "Which is the standard format of a user story?",
+  "opts": [
+   "As a <role>, I want <goal>, so that <benefit>",
+   "Given <context>, when <event>, then <outcome>",
+   "Task, Owner, Deadline",
+   "Problem, Cause, Solution"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 37,
+  "q": "Which technique is commonly used to estimate user stories with relative sizing?",
+  "opts": [
+   "Planning Poker",
+   "Paired Comparison",
+   "MoSCoW",
+   "100-point method"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 38,
+  "q": "Who commits to delivering the selected user stories in a Sprint?",
+  "opts": [
+   "Product Owner",
+   "Scrum Master",
+   "Stakeholders",
+   "Scrum Team"
+  ],
+  "key": "D",
+  "wrong": "A"
+ },
+ {
+  "n": 39,
+  "q": "In which meeting does the Scrum Team break user stories down into tasks?",
+  "opts": [
+   "Daily Standup",
+   "Task Planning Meeting",
+   "Sprint Review Meeting",
+   "Retrospect Sprint Meeting"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 40,
+  "q": "Which tool shows the work remaining in a Sprint over time?",
+  "opts": [
+   "Sprint Burndown Chart",
+   "Release Planning Schedule",
+   "Project Vision Statement",
+   "Risk Register"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 41,
+  "q": "What is velocity?",
+  "opts": [
+   "The number of team members",
+   "The speed of a single developer",
+   "The amount of work a team completes in a Sprint",
+   "The total cost of the project"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 42,
+  "q": "What is the time-box of the Daily Standup?",
+  "opts": [
+   "15 minutes",
+   "30 minutes",
+   "1 hour",
+   "As long as needed"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 43,
+  "q": "What does a Scrumboard typically show?",
+  "opts": [
+   "Risks and their probabilities",
+   "Stakeholder contact details",
+   "Task status, such as To Do, In Progress and Done",
+   "The project budget"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 44,
+  "q": "What is the purpose of Groom Prioritized Product Backlog?",
+  "opts": [
+   "To close the Sprint",
+   "To keep the backlog refined, estimated and prioritized",
+   "To select the Scrum Master",
+   "To ship the deliverables"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 45,
+  "q": "Who is responsible for removing impediments for the team?",
+  "opts": [
+   "Product Owner",
+   "Scrum Master",
+   "Stakeholders",
+   "Scrum Guidance Body"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 46,
+  "q": "In Demonstrate and Validate Sprint, who accepts or rejects the deliverables?",
+  "opts": [
+   "Scrum Master",
+   "Scrum Team",
+   "Product Owner",
+   "Vendor"
+  ],
+  "key": "C",
+  "wrong": "D"
+ },
+ {
+  "n": 47,
+  "q": "What is a key output of Retrospect Sprint?",
+  "opts": [
+   "Agreed Actionable Improvements",
+   "Project Vision Statement",
+   "Prioritized Product Backlog",
+   "Release Planning Schedule"
+  ],
+  "key": "A",
+  "wrong": "B"
+ },
+ {
+  "n": 48,
+  "q": "What is the main purpose of Ship Deliverables?",
+  "opts": [
+   "To estimate the next Sprint",
+   "To deliver the accepted deliverables to the customer or stakeholders",
+   "To create the Sprint Backlog",
+   "To select the Scrum Team"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 49,
+  "q": "What happens in Retrospect Project?",
+  "opts": [
+   "Stakeholders approve the budget",
+   "The Scrum Team and stakeholders identify lessons learned after the release",
+   "The Product Owner writes new epics",
+   "The Scrum Master is replaced"
+  ],
+  "key": "B",
+  "wrong": "C"
+ },
+ {
+  "n": 50,
+  "q": "What is the purpose of a Scrum of Scrums Meeting?",
+  "opts": [
+   "To replace the Daily Standup in small projects",
+   "To let representatives of several teams coordinate and resolve cross-team issues",
+   "To approve the final release",
+   "To estimate user stories"
+  ],
+  "key": "B",
+  "wrong": "C"
+ }
+]
