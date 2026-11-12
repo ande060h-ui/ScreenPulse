@@ -57,7 +57,7 @@ and a Gemini API key from <https://aistudio.google.com/apikey>.
 open build/ScreenPulse.app
 ```
 
-1. Paste your API key under **Settings → Gemini (AI)**. It is stored in the macOS Keychain.
+1. Paste your API key under **Settings → Gemini**. It is stored in the macOS Keychain.
 2. Grant **Screen Recording** and **Input Monitoring** when asked (System Settings → Privacy & Security), then restart the app.
 3. Point at something and press **⌃⌥⌘ Space**.
 

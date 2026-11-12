@@ -9,7 +9,7 @@
 ## 2. Install
 
 1. Open **ScreenPulse.dmg**, drag **ScreenPulse** onto **Applications**, and open it from there. (The first time, macOS says it could not verify the app. Click **Done** or **OK**, not **Move to Trash**. Then open System Settings → Privacy & Security, scroll down to Security, click **Open Anyway** and confirm with your password or Touch ID.) The Settings window opens and an icon (three rows of dots) appears in the menu bar. There is no Dock icon.
-2. Under **Gemini (AI)**, paste your API key, press **Save**, then **Check key**. The key is stored in your macOS Keychain, and Check key tells you in plain words whether it works. If you do not have a key yet, press **How do I get a key?** for the step-by-step guide (also on the website under *Get started*).
+2. On the **Gemini** tab, paste your API key, press **Save**, then **Check key**. The key is stored in your macOS Keychain, and Check key tells you in plain words whether it works. If you do not have a key yet, press **How do I get a key?** for the step-by-step guide (also on the website under *Get started*).
 3. Under **Permissions**, grant:
    - **Screen Recording** – needed to capture the screen. In System Settings this is listed under *Privacy & Security → Screen & System Audio Recording*.
    - **Input Monitoring** – needed to control the Caps Lock light (and for the optional ⌃⌥⌘-only trigger).
